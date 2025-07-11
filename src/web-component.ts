@@ -127,12 +127,18 @@ class ArrangementOversikt extends HTMLElement {
 
   private formatDate(dateStr: string): string {
     try {
-      // Parse DD.MM.YYYY format
-      const parts = dateStr.split('.');
+      // Parse DD.MM.YY or DD.MM.YYYY format
+      const parts = dateStr.trim().split('.');
       if (parts.length === 3) {
         const day = parseInt(parts[0], 10);
         const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-        const year = parseInt(parts[2], 10);
+        let year = parseInt(parts[2], 10);
+        
+        // Handle 2-digit years (e.g., 25 -> 2025)
+        if (year < 100) {
+          year += 2000;
+        }
+        
         const date = new Date(year, month, day);
         
         return date.toLocaleDateString('nb-NO', { 
@@ -167,14 +173,20 @@ class ArrangementOversikt extends HTMLElement {
       // First filter out past events
       if (row[0]) {
         try {
-          // Parse DD.MM.YYYY format
-          const parts = row[0].split('.');
+          // Parse DD.MM.YY or DD.MM.YYYY format
+          const parts = row[0].trim().split('.');
           let eventDate;
           
           if (parts.length === 3) {
             const day = parseInt(parts[0], 10);
             const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-            const year = parseInt(parts[2], 10);
+            let year = parseInt(parts[2], 10);
+            
+            // Handle 2-digit years (e.g., 25 -> 2025)
+            if (year < 100) {
+              year += 2000;
+            }
+            
             eventDate = new Date(year, month, day);
           } else {
             eventDate = new Date(row[0]);
