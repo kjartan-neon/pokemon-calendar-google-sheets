@@ -326,31 +326,67 @@ class ArrangementOversikt extends HTMLElement {
           transform: translateY(-1px);
         }
 
-        .cup-challenge-btn {
-          background: #38a169;
-          color: white;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
+        .toggle-container {
+          display: flex;
+          align-items: center;
+        }
+
+        .toggle-label {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
           cursor: pointer;
-          font-size: 0.85rem;
+          font-size: 0.9rem;
           font-weight: 500;
-          transition: all 0.2s ease;
+          color: #2d3748;
+          user-select: none;
+        }
+
+        .toggle-input {
+          display: none;
+        }
+
+        .toggle-slider {
+          position: relative;
+          width: 50px;
+          height: 24px;
+          background: #cbd5e0;
+          border-radius: 24px;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+
+        .toggle-slider::before {
+          content: '';
+          position: absolute;
+          top: 2px;
+          left: 2px;
+          width: 20px;
+          height: 20px;
+          background: white;
+          border-radius: 50%;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-input:checked + .toggle-slider {
+          background: #4299e1;
+        }
+
+        .toggle-input:checked + .toggle-slider::before {
+          transform: translateX(26px);
+        }
+
+        .toggle-slider:hover {
+          background: #a0aec0;
+        }
+
+        .toggle-input:checked + .toggle-slider:hover {
+          background: #3182ce;
+        }
+
+        .toggle-text {
           white-space: nowrap;
-        }
-
-        .cup-challenge-btn:hover {
-          background: #2f855a;
-          transform: translateY(-1px);
-        }
-
-        .cup-challenge-btn.active {
-          background: #2d3748;
-          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .cup-challenge-btn.active:hover {
-          background: #1a202c;
         }
 
         .refresh-btn, .retry-btn {
@@ -546,6 +582,11 @@ class ArrangementOversikt extends HTMLElement {
             max-width: none;
           }
 
+          .toggle-container {
+            justify-content: center;
+            margin-top: 0.5rem;
+          }
+
           .header {
             flex-direction: column;
             text-align: center;
@@ -617,9 +658,17 @@ class ArrangementOversikt extends HTMLElement {
               </button>
             ` : ''}
             
-            <button class="cup-challenge-btn ${this.showOnlyCupChallenge ? 'active' : ''}">
-              Vis bare cup og challenge
-            </button>
+            <div class="toggle-container">
+              <label class="toggle-label">
+                <input 
+                  type="checkbox" 
+                  class="toggle-input"
+                  ${this.showOnlyCupChallenge ? 'checked' : ''}
+                />
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">Vis bare cup og challenge</span>
+              </label>
+            </div>
           </div>
         ` : ''}
 
@@ -700,7 +749,7 @@ class ArrangementOversikt extends HTMLElement {
     const retryBtn = this.shadow.querySelector('.retry-btn');
     const leagueSelect = this.shadow.querySelector('#league-filter') as HTMLSelectElement;
     const clearFilterBtns = this.shadow.querySelectorAll('.clear-filter-btn');
-    const cupChallengeBtn = this.shadow.querySelector('.cup-challenge-btn');
+    const toggleInput = this.shadow.querySelector('.toggle-input') as HTMLInputElement;
 
     if (refreshBtn) {
       refreshBtn.addEventListener('click', () => this.fetchCSVData());
@@ -724,9 +773,9 @@ class ArrangementOversikt extends HTMLElement {
       });
     });
 
-    if (cupChallengeBtn) {
-      cupChallengeBtn.addEventListener('click', () => {
-        this.showOnlyCupChallenge = !this.showOnlyCupChallenge;
+    if (toggleInput) {
+      toggleInput.addEventListener('change', (e) => {
+        this.showOnlyCupChallenge = (e.target as HTMLInputElement).checked;
         this.render();
       });
     }
