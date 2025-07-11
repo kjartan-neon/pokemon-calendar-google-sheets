@@ -74,8 +74,26 @@
 
   function formatDate(dateStr: string): string {
     try {
+      // Parse DD.MM.YYYY format
+      const parts = dateStr.split('.');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+        const year = parseInt(parts[2], 10);
+        const date = new Date(year, month, day);
+        
+        return date.toLocaleDateString('nb-NO', { 
+          weekday: 'long',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+      }
+      
+      // Fallback to original parsing
       const date = new Date(dateStr);
       return date.toLocaleDateString('nb-NO', { 
+        weekday: 'long',
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
@@ -95,7 +113,19 @@
     // First filter out past events
     if (row[0]) {
       try {
-        const eventDate = new Date(row[0]);
+        // Parse DD.MM.YYYY format
+        const parts = row[0].split('.');
+        let eventDate;
+        
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+          const year = parseInt(parts[2], 10);
+          eventDate = new Date(year, month, day);
+        } else {
+          eventDate = new Date(row[0]);
+        }
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Set to start of today
         
