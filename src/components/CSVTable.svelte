@@ -457,6 +457,7 @@
 
   .toggle-text {
     white-space: nowrap;
+    font-weight: 800;
   }
 
   .refresh-btn, .retry-btn {
