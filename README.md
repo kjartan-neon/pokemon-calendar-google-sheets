@@ -7,7 +7,7 @@ Date	Time	Headline	Description	Link	Liga	Lokasjon	Fullt	Format	Type
 
 # Demo
 
-https:/oslopokemon.com
+https://oslopokemon.com
 
 ## Recommended IDE Setup
 
