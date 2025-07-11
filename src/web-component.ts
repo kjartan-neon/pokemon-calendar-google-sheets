@@ -617,7 +617,7 @@ class ArrangementOversikt extends HTMLElement {
                     <h3 class="headline">${row[2] || 'Arrangement'}</h3>
                     ${row[3] && row[3].trim() ? `
                       <p class="description">
-                        ${row[8] && row[8].trim() ? `<strong>${row[8].trim()}:</strong> ` : ''}${row[3]}
+                        ${row[9] && row[9].trim() ? `<strong>${row[9].trim()}:</strong> ` : ''}${row[3]}
                       </p>
                     ` : ''}
                     ${row[5] && row[5].trim() ? `

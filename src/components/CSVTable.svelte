@@ -243,8 +243,8 @@
               {/if}
               {#if row[3] && row[3].trim()}
                 <p class="description">
-                  {#if row[8] && row[8].trim()}
-                    <strong>{row[8].trim()}:</strong> 
+                  {#if row[9] && row[9].trim()}
+                    <strong>{row[9].trim()}:</strong> 
                   {/if}
                   {row[3]}
                 </p>
