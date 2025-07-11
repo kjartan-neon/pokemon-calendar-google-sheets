@@ -7,6 +7,7 @@
   let error: string | null = null;
   let selectedLeague: string = 'alle';
   let availableLeagues: string[] = [];
+  let showOnlyCupChallenge: boolean = false;
 
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTe5d_kLm4r1dgbaXg6zKNmEhF-IBxjOqbny2gqiR2QdK5Y6P2BJ6FFJBDzesHr0xh1HQtzD0ik841/pub?output=csv';
 
@@ -156,6 +157,13 @@
     // Then filter by league
     if (selectedLeague === 'alle') return true;
     return row[5] && row[5].trim() === selectedLeague;
+  }).filter(row => {
+    // Filter by Cup/Challenge if enabled
+    if (!showOnlyCupChallenge) return true;
+    
+    // Check if format field (index 9) contains "cup" or "challenge" (case insensitive)
+    const format = row[9] && row[9].trim().toLowerCase();
+    return format && (format.includes('cup') || format.includes('challenge'));
   }) : [];
 
   onMount(() => {
@@ -192,6 +200,14 @@
           Fjern Filter
         </button>
       {/if}
+      
+      <button 
+        on:click={() => showOnlyCupChallenge = !showOnlyCupChallenge} 
+        class="cup-challenge-btn"
+        class:active={showOnlyCupChallenge}
+      >
+        Vis bare cup og challenge
+      </button>
     </div>
   {/if}
   {#if loading}
@@ -374,6 +390,33 @@
   .clear-filter-btn:hover {
     background: #c53030;
     transform: translateY(-1px);
+  }
+
+  .cup-challenge-btn {
+    background: #38a169;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .cup-challenge-btn:hover {
+    background: #2f855a;
+    transform: translateY(-1px);
+  }
+
+  .cup-challenge-btn.active {
+    background: #2d3748;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .cup-challenge-btn.active:hover {
+    background: #1a202c;
   }
 
   .refresh-btn, .retry-btn {

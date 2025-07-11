@@ -55,6 +55,7 @@ class ArrangementOversikt extends HTMLElement {
   private error: string | null = null;
   private selectedLeague = 'alle';
   private availableLeagues: string[] = [];
+  private showOnlyCupChallenge = false;
   private shadow: ShadowRoot;
 
   private readonly CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTe5d_kLm4r1dgbaXg6zKNmEhF-IBxjOqbny2gqiR2QdK5Y6P2BJ6FFJBDzesHr0xh1HQtzD0ik841/pub?output=csv';
@@ -206,6 +207,13 @@ class ArrangementOversikt extends HTMLElement {
       // Then filter by league
       if (this.selectedLeague === 'alle') return true;
       return row[5] && row[5].trim() === this.selectedLeague;
+    }).filter(row => {
+      // Filter by Cup/Challenge if enabled
+      if (!this.showOnlyCupChallenge) return true;
+      
+      // Check if format field (index 9) contains "cup" or "challenge" (case insensitive)
+      const format = row[9] && row[9].trim().toLowerCase();
+      return format && (format.includes('cup') || format.includes('challenge'));
     });
   }
 
@@ -316,6 +324,33 @@ class ArrangementOversikt extends HTMLElement {
         .clear-filter-btn:hover {
           background: #c53030;
           transform: translateY(-1px);
+        }
+
+        .cup-challenge-btn {
+          background: #38a169;
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .cup-challenge-btn:hover {
+          background: #2f855a;
+          transform: translateY(-1px);
+        }
+
+        .cup-challenge-btn.active {
+          background: #2d3748;
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .cup-challenge-btn.active:hover {
+          background: #1a202c;
         }
 
         .refresh-btn, .retry-btn {
@@ -581,6 +616,10 @@ class ArrangementOversikt extends HTMLElement {
                 Fjern Filter
               </button>
             ` : ''}
+            
+            <button class="cup-challenge-btn ${this.showOnlyCupChallenge ? 'active' : ''}">
+              Vis bare cup og challenge
+            </button>
           </div>
         ` : ''}
 
@@ -661,6 +700,7 @@ class ArrangementOversikt extends HTMLElement {
     const retryBtn = this.shadow.querySelector('.retry-btn');
     const leagueSelect = this.shadow.querySelector('#league-filter') as HTMLSelectElement;
     const clearFilterBtns = this.shadow.querySelectorAll('.clear-filter-btn');
+    const cupChallengeBtn = this.shadow.querySelector('.cup-challenge-btn');
 
     if (refreshBtn) {
       refreshBtn.addEventListener('click', () => this.fetchCSVData());
@@ -683,6 +723,13 @@ class ArrangementOversikt extends HTMLElement {
         this.render();
       });
     });
+
+    if (cupChallengeBtn) {
+      cupChallengeBtn.addEventListener('click', () => {
+        this.showOnlyCupChallenge = !this.showOnlyCupChallenge;
+        this.render();
+      });
+    }
   }
 }
 
