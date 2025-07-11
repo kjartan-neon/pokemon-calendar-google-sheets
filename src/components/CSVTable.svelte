@@ -76,10 +76,9 @@
     try {
       const date = new Date(dateStr);
       return date.toLocaleDateString('nb-NO', { 
-        weekday: 'long',
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
       });
     } catch {
       return dateStr;
