@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrangement Oversikt - Web Component Example</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f7fafc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            margin-bottom: 2rem;
+        }
+        
+        .info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info h2 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+        
+        .info code {
+            background: #f7fafc;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Arrangement Oversikt Web Component</h1>
+        
+        <div class="info">
+            <h2>📋 Hvordan bruke denne komponenten</h2>
+            <p>For å bruke denne komponenten på din egen nettside, legg til følgende kode:</p>
+            <pre><code>&lt;script src="arrangement-oversikt.js"&gt;&lt;/script&gt;
+&lt;arrangement-oversikt&gt;&lt;/arrangement-oversikt&gt;</code></pre>
+            
+            <p><strong>Det er alt!</strong> Komponenten vil automatisk hente data og vise arrangementene.</p>
+        </div>
+        
+        <!-- Her er selve web komponenten -->
+        <arrangement-oversikt></arrangement-oversikt>
+    </div>
+    
+    <!-- Last inn web komponenten -->
+    <script src="./dist/arrangement-oversikt.js"></script>
+</body>
+</html>
