@@ -616,7 +616,9 @@ class ArrangementOversikt extends HTMLElement {
                   <div class="event-content">
                     <h3 class="headline">${row[2] || 'Arrangement'}</h3>
                     ${row[3] && row[3].trim() ? `
-                      <p class="description">${row[3]}</p>
+                      <p class="description">
+                        ${row[8] && row[8].trim() ? `<strong>${row[8].trim()}:</strong> ` : ''}${row[3]}
+                      </p>
                     ` : ''}
                     ${row[5] && row[5].trim() ? `
                       <div class="league-tag" style="background: ${leagueColor.bg}; box-shadow: 0 2px 4px ${leagueColor.shadow};">

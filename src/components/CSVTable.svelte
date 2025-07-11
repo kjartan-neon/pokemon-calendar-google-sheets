@@ -242,7 +242,12 @@
                 </div>
               {/if}
               {#if row[3] && row[3].trim()}
-                <p class="description">{row[3]}</p>
+                <p class="description">
+                  {#if row[8] && row[8].trim()}
+                    <strong>{row[8].trim()}:</strong> 
+                  {/if}
+                  {row[3]}
+                </p>
               {/if}
               {#if row[5] && row[5].trim()}
                 <div class="league-tag" style="background: {getLeagueColor(row[5].trim()).bg}; box-shadow: 0 2px 4px {getLeagueColor(row[5].trim()).shadow};">
