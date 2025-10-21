@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { PokemonCard, QuizQuestion, CollectedCard, Collection } from './types';
-  import { getCardsForQuiz, getRandomCards } from './services/pokemon-tcg-api';
+  import { getLatestSet, getCardsFromSet, getRandomCards } from './services/tcgdex-api';
   import { loadCollection, addCardToCollection, updateStats } from './services/local-storage';
   import { generateQuizQuestion, checkAnswer } from './utils/quiz-logic';
   import QuizView from './components/QuizView.svelte';
@@ -29,27 +29,20 @@
 
   async function loadNewQuestion() {
     try {
-      console.log('loadNewQuestion called, current allCards.length:', allCards.length);
       gameState = 'loading';
 
       if (allCards.length < 2) {
-        console.log('Fetching new cards...');
-        allCards = await getCardsForQuiz();
-        console.log('Fetched cards, total:', allCards.length);
+        const latestSet = await getLatestSet();
+        allCards = await getCardsFromSet(latestSet.id);
       }
 
-      console.log('Getting random cards...');
       const selectedCards = getRandomCards(allCards, 2);
-      console.log('Selected cards:', selectedCards.map(c => c.name));
-
-      console.log('Generating quiz question...');
       const question = generateQuizQuestion(selectedCards);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
       }
 
-      console.log('Question generated successfully');
       currentQuestion = question;
       gameState = 'quiz';
     } catch (error) {
