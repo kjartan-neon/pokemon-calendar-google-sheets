@@ -41,6 +41,7 @@ export interface Translations {
   loading: string;
   yourCollection: string;
   language: string;
+  damageQuestion: (damage: number) => string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -85,6 +86,7 @@ export const translations: Record<Language, Translations> = {
     loading: 'Loading new question...',
     yourCollection: 'Your Collection',
     language: 'Language',
+    damageQuestion: (damage: number) => `Your Pokémon deals ${damage} damage each turn. How many turns does it take to defeat this Pokémon?`,
   },
   no: {
     appTitle: '16 K',
@@ -127,6 +129,7 @@ export const translations: Record<Language, Translations> = {
     loading: 'Laster nytt spørsmål...',
     yourCollection: 'Din Samling',
     language: 'Språk',
+    damageQuestion: (damage: number) => `Din Pokémon gjør ${damage} skade hver runde. Hvor mange runder tar det å beseire denne Pokémonen?`,
   },
 };
 

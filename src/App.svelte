@@ -86,7 +86,7 @@
 
       const randomCard = getRandomCard(availableCards);
       const cardDetails = await getCardDetails(randomCard.id, currentSetId);
-      const question = generateQuizQuestion(cardDetails);
+      const question = generateQuizQuestion(cardDetails, t);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
