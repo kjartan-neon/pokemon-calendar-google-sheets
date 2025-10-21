@@ -1,10 +1,10 @@
 import type { PokemonCard, QuizQuestion } from '../types';
 import type { Translations } from '../i18n/translations';
 
-function generateRandomMathQuestion(): { question: string; answer: number } {
+function generateRandomMathQuestion(t: Translations): { question: string; answer: number } {
   const num1 = Math.floor(Math.random() * 50) + 10;
   const num2 = Math.floor(Math.random() * 50) + 10;
-  const operators = ['+', '-'];
+  const operators: Array<'+' | '-'> = ['+', '-'];
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
   let answer: number;
@@ -12,23 +12,23 @@ function generateRandomMathQuestion(): { question: string; answer: number } {
 
   if (operator === '+') {
     answer = num1 + num2;
-    question = `What is ${num1} + ${num2}?`;
+    question = t.mathQuestion(num1, num2, '+');
   } else {
     answer = num1 + num2;
     const largerNum = answer;
     const smallerNum = num1;
     answer = smallerNum;
-    question = `What is ${largerNum} - ${num2}?`;
+    question = t.mathQuestion(largerNum, num2, '-');
   }
 
   return { question, answer };
 }
 
-function generateAdditionQuestion(): { question: string; answer: number } {
+function generateAdditionQuestion(t: Translations): { question: string; answer: number } {
   const num1 = Math.floor(Math.random() * 50) + 10;
   const num2 = Math.floor(Math.random() * 50) + 10;
   const answer = num1 + num2;
-  const question = `What is ${num1} + ${num2}?`;
+  const question = t.mathQuestion(num1, num2, '+');
   return { question, answer };
 }
 
@@ -47,13 +47,13 @@ export function generateQuizQuestion(card: PokemonCard, t: Translations, isRareC
     correctAnswer = Math.ceil(card.hp / damagePerTurn);
     questionText = t.damageQuestion(damagePerTurn);
   } else {
-    const mathQ = generateRandomMathQuestion();
+    const mathQ = generateRandomMathQuestion(t);
     questionText = mathQ.question;
     correctAnswer = mathQ.answer;
   }
 
   if (isRareCard) {
-    const additionQ = generateAdditionQuestion();
+    const additionQ = generateAdditionQuestion(t);
     secondQuestion = additionQ.question;
     secondAnswer = additionQ.answer;
   }
