@@ -32,7 +32,7 @@ export function generateQuizQuestion(card: PokemonCard): QuizQuestion | null {
 
   if (card.hp && card.hp > 0) {
     isPokemon = true;
-    const damagePerTurn = [10, 20, 30, 40, 50][Math.floor(Math.random() * 5)];
+    const damagePerTurn = [10, 20, 30, 40, 50, 60, 60 , 80, 120, 300][Math.floor(Math.random() * 5)];
     correctAnswer = Math.ceil(card.hp / damagePerTurn);
     questionText = `Your Pokémon deals ${damagePerTurn} damage each turn. How many turns does it take to defeat this Pokémon?`;
   } else {
