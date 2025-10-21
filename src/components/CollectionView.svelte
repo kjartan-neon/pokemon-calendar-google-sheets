@@ -7,8 +7,9 @@
 
   export let collection: Collection;
   export let t: Translations;
+  export let language: 'en' | 'no';
 
-  const dispatch = createEventDispatcher<{ refresh: void }>();
+  const dispatch = createEventDispatcher<{ refresh: void; languageChange: string }>();
 
   let fileInput: HTMLInputElement;
   let message: { text: string; type: 'success' | 'error' } | null = null;
@@ -74,6 +75,11 @@
     }
   }
 
+  function handleLanguageChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    dispatch('languageChange', target.value);
+  }
+
   $: accuracy = collection.stats.totalQuestions > 0
     ? Math.round((collection.stats.correctAnswers / collection.stats.totalQuestions) * 100)
     : 0;
@@ -82,23 +88,32 @@
 <div class="collection-view">
   <div class="collection-header">
     <h2>{t.yourCollection}</h2>
-    <div class="header-actions">
-      <button class="btn-secondary" on:click={handleExport}>
-        {t.exportBackup}
-      </button>
-      <button class="btn-secondary" on:click={handleImportClick}>
-        {t.importBackup}
-      </button>
-      <button class="btn-error" on:click={handleClearClick}>
-        {t.clearThisSet}
-      </button>
-      <input
-        type="file"
-        bind:this={fileInput}
-        on:change={handleFileChange}
-        accept=".json"
-        style="display: none;"
-      />
+    <div class="header-controls">
+      <div class="language-selector-container">
+        <label for="language-select">{t.language || 'Language'}:</label>
+        <select id="language-select" class="language-selector" value={language} on:change={handleLanguageChange}>
+          <option value="en">English</option>
+          <option value="no">Norsk</option>
+        </select>
+      </div>
+      <div class="header-actions">
+        <button class="btn-secondary" on:click={handleExport}>
+          {t.exportBackup}
+        </button>
+        <button class="btn-secondary" on:click={handleImportClick}>
+          {t.importBackup}
+        </button>
+        <button class="btn-error" on:click={handleClearClick}>
+          {t.clearThisSet}
+        </button>
+        <input
+          type="file"
+          bind:this={fileInput}
+          on:change={handleFileChange}
+          accept=".json"
+          style="display: none;"
+        />
+      </div>
     </div>
   </div>
 
@@ -183,12 +198,7 @@
   }
 
   .collection-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: var(--spacing-8);
-    flex-wrap: wrap;
-    gap: var(--spacing-4);
   }
 
   .collection-header h2 {
@@ -200,6 +210,58 @@
     background-clip: text;
     margin: 0;
     line-height: var(--line-height-tight);
+  }
+
+  .header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-4);
+  }
+
+  .language-selector-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+  }
+
+  .language-selector-container label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-700);
+  }
+
+  .language-selector {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    backdrop-filter: blur(10px);
+    color: var(--color-neutral-900);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-weight-semibold);
+    transition: all var(--transition-fast);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .language-selector:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .language-selector:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  }
+
+  .language-selector option {
+    background: white;
+    color: var(--color-neutral-900);
   }
 
   .header-actions {
@@ -438,13 +500,17 @@
       padding: var(--spacing-4);
     }
 
-    .collection-header {
+    .collection-header h2 {
+      font-size: var(--font-size-3xl);
+    }
+
+    .header-controls {
       flex-direction: column;
       align-items: stretch;
     }
 
-    .collection-header h2 {
-      font-size: var(--font-size-3xl);
+    .language-selector-container {
+      justify-content: space-between;
     }
 
     .header-actions {

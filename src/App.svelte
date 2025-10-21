@@ -23,13 +23,19 @@
   let wonCard: PokemonCard | null = null;
   let errorMessage: string = '';
   let currentView: 'quiz' | 'collection' = 'quiz';
+  let showLanguageDialog = false;
   let currentSetId: string = $selectedSet;
 
   $: t = getTranslations($language);
 
   onMount(() => {
     collection = loadCollection();
-    loadNewQuestion();
+    const hasSeenLanguageDialog = localStorage.getItem('tcg-seen-language-dialog');
+    if (!hasSeenLanguageDialog) {
+      showLanguageDialog = true;
+    } else {
+      loadNewQuestion();
+    }
   });
 
   function handleSetChange(event: Event) {
@@ -40,9 +46,15 @@
     loadNewQuestion();
   }
 
-  function handleLanguageChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    language.set(target.value as 'en' | 'no');
+  function handleLanguageChange(value: string) {
+    language.set(value as 'en' | 'no');
+  }
+
+  function handleLanguageSelect(selectedLanguage: 'en' | 'no') {
+    language.set(selectedLanguage);
+    localStorage.setItem('tcg-seen-language-dialog', 'true');
+    showLanguageDialog = false;
+    loadNewQuestion();
   }
 
   async function loadNewQuestion() {
@@ -133,19 +145,6 @@
 <div class="app">
   <header class="app-header">
     <h1 class="app-title">{t.appTitle}</h1>
-    <div class="header-controls">
-      <div class="selectors">
-        <select class="selector" value={$selectedSet} on:change={handleSetChange}>
-          {#each availableSets as set}
-            <option value={set.id}>{set.name}</option>
-          {/each}
-        </select>
-        <select class="selector" value={$language} on:change={handleLanguageChange}>
-          <option value="en">English</option>
-          <option value="no">Norsk</option>
-        </select>
-      </div>
-    </div>
     <nav>
       <button
         class="nav-btn"
@@ -169,6 +168,13 @@
       {#if gameState === 'loading'}
         <LoadingView message={t.loading} />
       {:else if gameState === 'quiz' && currentQuestion}
+        <div class="set-selector-container">
+          <select class="set-selector" value={$selectedSet} on:change={handleSetChange}>
+            {#each availableSets as set}
+              <option value={set.id}>{set.name}</option>
+            {/each}
+          </select>
+        </div>
         <QuizView question={currentQuestion} {t} currentSet={availableSets.find(s => s.id === currentSetId)?.name || ''} on:answer={handleAnswer} />
       {:else if gameState === 'result' && currentQuestion}
         <ResultView
@@ -183,9 +189,28 @@
         <ErrorView message={errorMessage} on:retry={handleRetry} />
       {/if}
     {:else}
-      <CollectionView {collection} {t} on:refresh={handleRefresh} />
+      <CollectionView {collection} {t} language={$language} on:refresh={handleRefresh} on:languageChange={(e) => handleLanguageChange(e.detail)} />
     {/if}
   </main>
+
+{#if showLanguageDialog}
+  <div class="dialog-overlay" role="button" tabindex="-1">
+    <div class="dialog language-dialog">
+      <h2>{$language === 'en' ? 'Choose Your Language' : 'Velg språk'}</h2>
+      <p>{$language === 'en' ? 'You can change this anytime in My Collection' : 'Du kan endre dette når som helst i Min samling'}</p>
+      <div class="language-buttons">
+        <button class="language-btn" on:click={() => handleLanguageSelect('en')}>
+          <span class="flag">🇬🇧</span>
+          <span>English</span>
+        </button>
+        <button class="language-btn" on:click={() => handleLanguageSelect('no')}>
+          <span class="flag">🇳🇴</span>
+          <span>Norsk</span>
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
 </div>
 
 <style>
@@ -214,46 +239,141 @@
     letter-spacing: 0.5px;
   }
 
-  .header-controls {
+
+  .set-selector-container {
     display: flex;
     justify-content: center;
-    margin-bottom: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+    padding: 0 var(--spacing-6);
   }
 
-  .selectors {
-    display: flex;
-    gap: var(--spacing-3);
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .selector {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: var(--spacing-2) var(--spacing-4);
-    border-radius: var(--border-radius-lg);
+  .set-selector {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    backdrop-filter: blur(10px);
+    color: var(--color-neutral-900);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--border-radius-xl);
     font-weight: var(--font-weight-semibold);
     transition: all var(--transition-fast);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
+    border: 2px solid rgba(102, 126, 234, 0.3);
     cursor: pointer;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .selector:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+  .set-selector:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border-color: rgba(102, 126, 234, 0.5);
   }
 
-  .selector:focus {
+  .set-selector:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.4);
-    border-color: white;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   }
 
-  .selector option {
-    background: #667eea;
-    color: white;
+  .set-selector option {
+    background: white;
+    color: var(--color-neutral-900);
+  }
+
+  .dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn var(--transition-fast) ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .dialog {
+    background: white;
+    border-radius: var(--border-radius-2xl);
+    padding: var(--spacing-8);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp var(--transition-normal) ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .language-dialog h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 var(--spacing-3) 0;
+    text-align: center;
+  }
+
+  .language-dialog p {
+    font-size: var(--font-size-base);
+    color: var(--color-neutral-600);
+    text-align: center;
+    margin: 0 0 var(--spacing-8) 0;
+    line-height: var(--line-height-relaxed);
+  }
+
+  .language-buttons {
+    display: flex;
+    gap: var(--spacing-4);
+    justify-content: center;
+  }
+
+  .language-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-6);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: var(--border-radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-900);
+    min-width: 140px;
+  }
+
+  .language-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border-color: #667eea;
+  }
+
+  .language-btn .flag {
+    font-size: 3rem;
   }
 
   nav {
@@ -307,6 +427,18 @@
     }
 
     .nav-btn {
+      width: 100%;
+    }
+
+    .set-selector-container {
+      padding: 0 var(--spacing-4);
+    }
+
+    .language-buttons {
+      flex-direction: column;
+    }
+
+    .language-btn {
       width: 100%;
     }
   }

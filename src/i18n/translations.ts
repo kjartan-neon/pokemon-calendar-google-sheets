@@ -40,6 +40,7 @@ export interface Translations {
   hits: string;
   loading: string;
   yourCollection: string;
+  language: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -83,6 +84,7 @@ export const translations: Record<Language, Translations> = {
     hits: 'hits',
     loading: 'Loading new question...',
     yourCollection: 'Your Collection',
+    language: 'Language',
   },
   no: {
     appTitle: 'TCG Matte',
@@ -124,6 +126,7 @@ export const translations: Record<Language, Translations> = {
     hits: 'treff',
     loading: 'Laster nytt spørsmål...',
     yourCollection: 'Din Samling',
+    language: 'Språk',
   },
 };
 
