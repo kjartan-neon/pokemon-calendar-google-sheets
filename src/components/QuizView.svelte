@@ -75,6 +75,7 @@
       {/if}
       <button
         class="submit-btn btn-primary"
+        style="margin-top: 2em;"
         on:click={handleSubmit}
         disabled={!userInput || (question.secondQuestion && !secondUserInput)}
       >
