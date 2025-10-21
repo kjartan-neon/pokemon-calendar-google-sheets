@@ -5,7 +5,7 @@
   export let isCorrect: boolean;
   export let correctAnswer: number;
   export let userAnswer: number;
-  export let wonCards: PokemonCard[];
+  export let wonCard: PokemonCard | null;
 
   const dispatch = createEventDispatcher<{ next: void }>();
 
@@ -22,22 +22,22 @@
       <p class="result-message">
         Great job! The answer was <strong>{correctAnswer}</strong> {correctAnswer === 1 ? 'hit' : 'hits'}!
       </p>
-      <div class="won-cards">
-        <h3>You won these cards!</h3>
-        <div class="cards-grid">
-          {#each wonCards as card}
+      {#if wonCard}
+        <div class="won-cards">
+          <h3>You won this card!</h3>
+          <div class="cards-grid">
             <div class="mini-card">
-              <img src={card.image} alt={card.name} />
-              <span class="card-name">{card.name}</span>
+              <img src={wonCard.image} alt={wonCard.name} />
+              <span class="card-name">{wonCard.name}</span>
             </div>
-          {/each}
+          </div>
         </div>
-      </div>
+      {/if}
     {:else}
       <div class="result-icon error">✗</div>
       <h2 class="result-title">Not quite!</h2>
       <p class="result-message">
-        You answered <strong>{userAnswer}</strong>, but the correct answer was <strong>{correctAnswer}</strong> {correctAnswer === 1 ? 'hit' : 'hits'}.
+        You answered <strong>{userAnswer}</strong>, but the correct answer was <strong>{correctAnswer}</strong>.
       </p>
       <p class="encouragement">Try again with the next question!</p>
     {/if}

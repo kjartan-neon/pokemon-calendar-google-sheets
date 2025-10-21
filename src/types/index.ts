@@ -1,22 +1,15 @@
 export interface PokemonCard {
   id: string;
+  localId?: string;
   name: string;
   hp?: number;
   image: string;
-  attacks?: Attack[];
   types?: string[];
   rarity?: string;
   set?: {
     id: string;
     name: string;
   };
-}
-
-export interface Attack {
-  name: string;
-  cost?: string[];
-  damage?: string;
-  effect?: string;
 }
 
 export interface PokemonSet {
@@ -26,15 +19,15 @@ export interface PokemonSet {
   cardCount?: {
     total: number;
   };
-  releaseDate: string;
+  releaseDate?: string;
+  cards?: PokemonCard[];
 }
 
 export interface QuizQuestion {
-  attackerCard: PokemonCard;
-  defenderCard: PokemonCard;
-  selectedAttack: Attack;
+  card: PokemonCard;
+  questionText: string;
   correctAnswer: number;
-  options: number[];
+  isPokemon: boolean;
 }
 
 export interface CollectedCard {

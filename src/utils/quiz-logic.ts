@@ -1,80 +1,51 @@
-import type { PokemonCard, Attack, QuizQuestion } from '../types';
+import type { PokemonCard, QuizQuestion } from '../types';
 
-function parseDamage(damageString?: string): number {
-  if (!damageString) return 0;
+function generateRandomMathQuestion(): { question: string; answer: number } {
+  const num1 = Math.floor(Math.random() * 50) + 10;
+  const num2 = Math.floor(Math.random() * 50) + 10;
+  const operators = ['+', '-'];
+  const operator = operators[Math.floor(Math.random() * operators.length)];
 
-  const match = damageString.match(/(\d+)/);
-  return match ? parseInt(match[1], 10) : 0;
+  let answer: number;
+  let question: string;
+
+  if (operator === '+') {
+    answer = num1 + num2;
+    question = `What is ${num1} + ${num2}?`;
+  } else {
+    answer = num1 + num2;
+    const largerNum = answer;
+    const smallerNum = num1;
+    answer = smallerNum;
+    question = `What is ${largerNum} - ${num2}?`;
+  }
+
+  return { question, answer };
 }
 
-function getValidAttack(card: PokemonCard): Attack | null {
-  if (!card.attacks || card.attacks.length === 0) return null;
+export function generateQuizQuestion(card: PokemonCard): QuizQuestion | null {
+  if (!card) return null;
 
-  const attacksWithDamage = card.attacks.filter(attack => {
-    const damage = parseDamage(attack.damage);
-    return damage > 0;
-  });
+  let questionText: string;
+  let correctAnswer: number;
+  let isPokemon = false;
 
-  if (attacksWithDamage.length === 0) return null;
-
-  const randomIndex = Math.floor(Math.random() * attacksWithDamage.length);
-  return attacksWithDamage[randomIndex];
-}
-
-function calculateHitsNeeded(attackDamage: number, defenderHP: number): number {
-  return Math.ceil(defenderHP / attackDamage);
-}
-
-function generateAnswerOptions(correctAnswer: number): number[] {
-  const options = new Set<number>([correctAnswer]);
-
-  while (options.size < 4) {
-    const offset = Math.floor(Math.random() * 3) + 1;
-    const shouldAdd = Math.random() > 0.5;
-
-    if (shouldAdd) {
-      options.add(correctAnswer + offset);
-    } else {
-      const newValue = correctAnswer - offset;
-      if (newValue > 0) {
-        options.add(newValue);
-      }
-    }
+  if (card.hp && card.hp > 0) {
+    isPokemon = true;
+    const damagePerTurn = [10, 20, 30, 40, 50][Math.floor(Math.random() * 5)];
+    correctAnswer = Math.ceil(card.hp / damagePerTurn);
+    questionText = `Your Pokémon deals ${damagePerTurn} damage each turn. How many turns does it take to defeat this Pokémon?`;
+  } else {
+    const mathQ = generateRandomMathQuestion();
+    questionText = mathQ.question;
+    correctAnswer = mathQ.answer;
   }
-
-  return Array.from(options).sort((a, b) => a - b);
-}
-
-export function generateQuizQuestion(cards: PokemonCard[]): QuizQuestion | null {
-  if (cards.length < 2) {
-    return null;
-  }
-
-  const [attackerCard, defenderCard] = cards;
-
-  const selectedAttack = getValidAttack(attackerCard);
-  if (!selectedAttack) {
-    return null;
-  }
-
-  if (!defenderCard.hp || defenderCard.hp <= 0) {
-    return null;
-  }
-
-  const attackDamage = parseDamage(selectedAttack.damage);
-  if (attackDamage <= 0) {
-    return null;
-  }
-
-  const correctAnswer = calculateHitsNeeded(attackDamage, defenderCard.hp);
-  const options = generateAnswerOptions(correctAnswer);
 
   return {
-    attackerCard,
-    defenderCard,
-    selectedAttack,
+    card,
+    questionText,
     correctAnswer,
-    options
+    isPokemon
   };
 }
 

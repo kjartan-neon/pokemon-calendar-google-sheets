@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { PokemonCard, QuizQuestion, CollectedCard, Collection } from './types';
-  import { getLatestSet, getCardsFromSet, getRandomCards } from './services/tcgdex-api';
+  import { getAllCardsFromSet, getCardDetails, getRandomCard } from './services/tcgdex-api';
   import { loadCollection, addCardToCollection, updateStats } from './services/local-storage';
   import { generateQuizQuestion, checkAnswer } from './utils/quiz-logic';
   import QuizView from './components/QuizView.svelte';
@@ -18,7 +18,7 @@
   let collection: Collection;
   let isCorrect: boolean = false;
   let userAnswer: number = 0;
-  let wonCards: PokemonCard[] = [];
+  let wonCard: PokemonCard | null = null;
   let errorMessage: string = '';
   let currentView: 'quiz' | 'collection' = 'quiz';
 
@@ -31,13 +31,13 @@
     try {
       gameState = 'loading';
 
-      if (allCards.length < 2) {
-        const latestSet = await getLatestSet();
-        allCards = await getCardsFromSet(latestSet.id);
+      if (allCards.length === 0) {
+        allCards = await getAllCardsFromSet();
       }
 
-      const selectedCards = getRandomCards(allCards, 2);
-      const question = generateQuizQuestion(selectedCards);
+      const randomCard = getRandomCard(allCards);
+      const cardDetails = await getCardDetails(randomCard.id);
+      const question = generateQuizQuestion(cardDetails);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
@@ -60,38 +60,22 @@
 
     updateStats(isCorrect);
 
-    wonCards = [];
+    wonCard = null;
     if (isCorrect) {
       const collectedCard: CollectedCard = {
-        id: currentQuestion.attackerCard.id,
-        name: currentQuestion.attackerCard.name,
-        image: currentQuestion.attackerCard.image,
-        hp: currentQuestion.attackerCard.hp,
-        types: currentQuestion.attackerCard.types,
-        rarity: currentQuestion.attackerCard.rarity,
+        id: currentQuestion.card.id,
+        name: currentQuestion.card.name,
+        image: currentQuestion.card.image,
+        hp: currentQuestion.card.hp,
+        types: currentQuestion.card.types,
+        rarity: currentQuestion.card.rarity,
         collectedAt: new Date().toISOString()
       };
 
       const added = addCardToCollection(collectedCard);
 
       if (added) {
-        wonCards.push(currentQuestion.attackerCard);
-      }
-
-      const defenderCollectedCard: CollectedCard = {
-        id: currentQuestion.defenderCard.id,
-        name: currentQuestion.defenderCard.name,
-        image: currentQuestion.defenderCard.image,
-        hp: currentQuestion.defenderCard.hp,
-        types: currentQuestion.defenderCard.types,
-        rarity: currentQuestion.defenderCard.rarity,
-        collectedAt: new Date().toISOString()
-      };
-
-      const defenderAdded = addCardToCollection(defenderCollectedCard);
-
-      if (defenderAdded) {
-        wonCards.push(currentQuestion.defenderCard);
+        wonCard = currentQuestion.card;
       }
     }
 
@@ -123,7 +107,7 @@
 
 <div class="app">
   <header class="app-header">
-    <h1>Pokemon TCG Math Quiz</h1>
+    <h1>Pok\u00e9mon TCG Math Quiz</h1>
     <nav>
       <button
         class="nav-btn"
@@ -137,7 +121,7 @@
         class:active={currentView === 'collection'}
         on:click={switchToCollection}
       >
-        My Collection ({collection?.cards.length || 0})
+        My Collection ({collection?.cards.length || 0}/{allCards.length})
       </button>
     </nav>
   </header>
@@ -153,7 +137,7 @@
           {isCorrect}
           correctAnswer={currentQuestion.correctAnswer}
           {userAnswer}
-          {wonCards}
+          {wonCard}
           on:next={handleNext}
         />
       {:else if gameState === 'error'}
