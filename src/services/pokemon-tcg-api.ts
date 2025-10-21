@@ -63,7 +63,7 @@ export async function getCardsForQuiz(): Promise<PokemonCard[]> {
     console.log('Starting getCardsForQuiz...');
     console.log('API_KEY exists:', !!API_KEY);
 
-    const query = 'supertype:Pokémon hp:[30 TO *] attacks.damage:[10 TO *]';
+    const query = 'supertype:Pokemon hp:[30 TO *]';
     const pageSize = 50;
     const randomPage = Math.floor(Math.random() * 10) + 1;
 
@@ -75,9 +75,13 @@ export async function getCardsForQuiz(): Promise<PokemonCard[]> {
 
     console.log('Fetching from URL:', url.toString());
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const response = await fetch(url.toString(), {
-      headers: getHeaders()
-    });
+      headers: getHeaders(),
+      signal: controller.signal
+    }).finally(() => clearTimeout(timeoutId));
 
     console.log('Response status:', response.status);
 
@@ -117,6 +121,12 @@ export async function getCardsForQuiz(): Promise<PokemonCard[]> {
     return validCards;
   } catch (error) {
     console.error('Error fetching cards from Pokemon TCG API:', error);
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - the API is taking too long to respond. Please try again.');
+      }
+      throw new Error(`API Error: ${error.message}`);
+    }
     throw error;
   }
 }
