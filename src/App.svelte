@@ -172,7 +172,7 @@
     if (isCorrect) {
       let canCollect = false;
 
-      if (needsStreak) {
+      if (needsStreak && !currentQuestion.secondQuestion) {
         collection = loadCollection();
 
         if (collection.streakCard?.id === currentQuestion.card.id) {
