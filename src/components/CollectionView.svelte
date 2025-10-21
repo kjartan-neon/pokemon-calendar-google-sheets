@@ -151,58 +151,6 @@
 
   <div class="collection-header">
     <h2>{t.yourCollection}</h2>
-    <div class="header-controls">
-      <div class="language-selector-container">
-        <label for="language-select">{t.language || 'Language'}:</label>
-        <select id="language-select" class="language-selector" value={language} on:change={handleLanguageChange}>
-          <option value="en">English</option>
-          <option value="no">Norsk</option>
-        </select>
-      </div>
-      <div class="header-actions">
-        <button class="btn-secondary" on:click={handleExport}>
-          {t.exportBackup}
-        </button>
-        <button class="btn-secondary" on:click={handleImportClick}>
-          {t.importBackup}
-        </button>
-        <button class="btn-error" on:click={handleClearClick}>
-          {t.clearThisSet}
-        </button>
-        <input
-          type="file"
-          bind:this={fileInput}
-          on:change={handleFileChange}
-          accept=".json"
-          style="display: none;"
-        />
-      </div>
-    </div>
-  </div>
-
-  {#if message}
-    <div class="message" class:success={message.type === 'success'} class:error={message.type === 'error'}>
-      {message.text}
-    </div>
-  {/if}
-
-  <div class="stats-section">
-    <div class="stat-card">
-      <div class="stat-value">{collection.cards.length}</div>
-      <div class="stat-label">{t.cardsCollected}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{collection.stats.totalQuestions}</div>
-      <div class="stat-label">{t.questionsAnswered}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{collection.stats.correctAnswers}</div>
-      <div class="stat-label">{t.correctAnswers}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">{accuracy}%</div>
-      <div class="stat-label">{t.accuracy}</div>
-    </div>
   </div>
 
   {#if collection.cards.length === 0}
@@ -231,6 +179,59 @@
           </div>
         </button>
       {/each}
+    </div>
+  {/if}
+
+  <div class="stats-section">
+    <div class="stat-card">
+      <div class="stat-value">{collection.cards.length}</div>
+      <div class="stat-label">{t.cardsCollected}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{collection.stats.totalQuestions}</div>
+      <div class="stat-label">{t.questionsAnswered}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{collection.stats.correctAnswers}</div>
+      <div class="stat-label">{t.correctAnswers}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{accuracy}%</div>
+      <div class="stat-label">{t.accuracy}</div>
+    </div>
+  </div>
+
+  <div class="functions-section">
+    <div class="language-selector-container">
+      <label for="language-select">{t.language || 'Language'}:</label>
+      <select id="language-select" class="language-selector" value={language} on:change={handleLanguageChange}>
+        <option value="en">English</option>
+        <option value="no">Norsk</option>
+      </select>
+    </div>
+    <div class="functions-actions">
+      <button class="btn-secondary" on:click={handleExport}>
+        {t.exportBackup}
+      </button>
+      <button class="btn-secondary" on:click={handleImportClick}>
+        {t.importBackup}
+      </button>
+      <button class="btn-error" on:click={handleClearClick}>
+        {t.clearThisSet}
+      </button>
+      <input
+        type="file"
+        bind:this={fileInput}
+        on:change={handleFileChange}
+        accept=".json"
+        style="display: none;"
+      />
+    </div>
+  </div>
+
+  {#if message}
+    <div class="message" class:success={message.type === 'success'} class:error={message.type === 'error'}>
+      {message.text}
     </div>
   {/if}
 </div>
@@ -372,13 +373,15 @@
     line-height: var(--line-height-tight);
   }
 
-  .header-controls {
+  .functions-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--spacing-4);
-    margin-top: var(--spacing-4);
+    margin-top: var(--spacing-8);
+    padding-top: var(--spacing-8);
+    border-top: 2px solid rgba(102, 126, 234, 0.2);
   }
 
   .language-selector-container {
@@ -424,7 +427,7 @@
     color: var(--color-neutral-900);
   }
 
-  .header-actions {
+  .functions-actions {
     display: flex;
     gap: var(--spacing-3);
   }
@@ -531,6 +534,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
   }
 
   .collection-card {
@@ -753,7 +757,7 @@
       font-size: var(--font-size-3xl);
     }
 
-    .header-controls {
+    .functions-section {
       flex-direction: column;
       align-items: stretch;
     }
@@ -762,7 +766,7 @@
       justify-content: space-between;
     }
 
-    .header-actions {
+    .functions-actions {
       flex-direction: column;
     }
 
