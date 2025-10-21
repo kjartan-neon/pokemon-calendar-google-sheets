@@ -58,14 +58,10 @@
         />
       </div>
       {#if question.secondQuestion}
-        <div class="question-item">
+        <div class="question-item" style="padding-top: 2em;">
           <span class="question-number">2.</span>
           <h3 class="question-text">{question.secondQuestion}</h3>
         </div>
-      {/if}
-
-
-      {#if question.secondQuestion}
         <div class="input-group">
           
           <input
