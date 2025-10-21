@@ -43,8 +43,8 @@ export function loadCollection(): Collection {
       parsed.currentStreak = 0;
     }
 
-    if (!parsed.unlockedRareCards) {
-      parsed.unlockedRareCards = [];
+    if (!parsed.unlockedRareSets) {
+      parsed.unlockedRareSets = {};
     }
 
     return parsed;

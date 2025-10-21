@@ -1,15 +1,37 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import type { Collection } from '../types';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import type { Collection, CollectedCard, PokemonCard } from '../types';
   import type { Translations } from '../i18n/translations';
   import { downloadBackup, uploadBackup } from '../utils/backup';
   import { clearCollection } from '../services/local-storage';
+  import { selectedSet } from '../stores/settings';
+  import { getAllCardsFromSet } from '../services/tcgdex-api';
 
   export let collection: Collection;
   export let t: Translations;
   export let language: 'en' | 'no';
 
   let selectedCard: CollectedCard | null = null;
+  let allCards: PokemonCard[] = [];
+  let rareCards: PokemonCard[] = [];
+
+  onMount(async () => {
+    await loadRareCards();
+  });
+
+  async function loadRareCards() {
+    try {
+      allCards = await getAllCardsFromSet($selectedSet);
+      const sortedCards = [...allCards].sort((a, b) => {
+        const numA = parseInt(a.localId || '0');
+        const numB = parseInt(b.localId || '0');
+        return numB - numA;
+      });
+      rareCards = sortedCards.slice(0, 5);
+    } catch (error) {
+      console.error('Error loading rare cards:', error);
+    }
+  }
 
   const dispatch = createEventDispatcher<{ refresh: void; languageChange: string }>();
 
@@ -86,9 +108,9 @@
     ? Math.round((collection.stats.correctAnswers / collection.stats.totalQuestions) * 100)
     : 0;
 
-  $: unlockedMilestones = Math.floor((collection.stats.totalHpDefeated || 0) / 16000);
-  $: hpToNextUnlock = 16000 - ((collection.stats.totalHpDefeated || 0) % 16000);
-  $: totalRareCardsUnlocked = (collection.unlockedRareCards || []).length;
+  $: hpToUnlock = 16000 - (collection.stats.totalHpDefeated || 0);
+  $: isUnlocked = (collection.unlockedRareSets && collection.unlockedRareSets[$selectedSet]) || false;
+  $: progressPercent = Math.min((collection.stats.totalHpDefeated / 16000) * 100, 100);
 
   function openCardModal(card: CollectedCard) {
     selectedCard = card;
@@ -101,36 +123,30 @@
 
 <div class="collection-view">
   <div class="rare-cards-section">
-    <h3 class="rare-cards-title">
-      {t.language === 'Språk' ? 'Unlocked Rare Cards' : 'Låste opp sjeldne kort'}
-    </h3>
-    <div class="rare-cards-info">
-      <div class="unlock-count">
-        {totalRareCardsUnlocked} {t.language === 'Språk' ? 'cards unlocked' : 'kort låst opp'}
-      </div>
-      <div class="hp-progress">
-        <div class="hp-progress-text">
-          {t.language === 'Språk' ? `${hpToNextUnlock.toLocaleString()} HP to unlock 5 more rare cards` : `${hpToNextUnlock.toLocaleString()} HP for å låse opp 5 flere sjeldne kort`}
-        </div>
-        <div class="hp-progress-bar">
-          <div class="hp-progress-fill" style="width: {((16000 - hpToNextUnlock) / 16000) * 100}%"></div>
-        </div>
-      </div>
+    <div class="rare-section-text">
+      {#if isUnlocked}
+        {t.language === 'Språk' ? 'Rare cards unlocked!' : 'Sjeldne kort låst opp!'}
+      {:else}
+        {t.language === 'Språk' ? `Defeat ${hpToUnlock > 0 ? hpToUnlock.toLocaleString() : 0} HP to unlock 5 rare cards` : `Beseir ${hpToUnlock > 0 ? hpToUnlock.toLocaleString() : 0} HP for å låse opp 5 sjeldne kort`}
+      {/if}
     </div>
-    {#if totalRareCardsUnlocked > 0}
-      <div class="rare-cards-grid">
-        {#each collection.unlockedRareCards || [] as card}
-          <button class="rare-card" on:click={() => openCardModal(card)}>
-            <img src={card.image} alt={card.name} />
-            <div class="rare-card-name">{card.name}</div>
-          </button>
-        {/each}
-      </div>
-    {:else}
-      <div class="no-unlocks">
-        <p>{t.language === 'Språk' ? 'Defeat 16,000 HP to unlock your first rare cards!' : 'Beseir 16 000 HP for å låse opp dine første sjeldne kort!'}</p>
+    {#if !isUnlocked}
+      <div class="hp-progress-bar">
+        <div class="hp-progress-fill" style="width: {progressPercent}%"></div>
       </div>
     {/if}
+    <div class="rare-cards-thumbnails">
+      {#each rareCards as card}
+        <button
+          class="rare-thumbnail"
+          class:unlocked={isUnlocked}
+          on:click={() => isUnlocked && openCardModal({ ...card, collectedAt: new Date().toISOString() })}
+          disabled={!isUnlocked}
+        >
+          <img src={card.image} alt={card.name} class:locked={!isUnlocked} />
+        </button>
+      {/each}
+    </div>
   </div>
 
   <div class="collection-header">
@@ -272,101 +288,66 @@
   .rare-cards-section {
     background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
     border: 2px solid rgba(255, 193, 7, 0.3);
-    border-radius: var(--border-radius-2xl);
-    padding: var(--spacing-6);
+    border-radius: var(--border-radius-xl);
+    padding: var(--spacing-4);
     margin-bottom: var(--spacing-8);
   }
 
-  .rare-cards-title {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    color: #f57c00;
-    margin: 0 0 var(--spacing-4) 0;
-    text-align: center;
-  }
-
-  .rare-cards-info {
-    margin-bottom: var(--spacing-6);
-  }
-
-  .unlock-count {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: #f57c00;
-    text-align: center;
-    margin-bottom: var(--spacing-3);
-  }
-
-  .rare-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: var(--spacing-4);
-    margin-top: var(--spacing-6);
-  }
-
-  .rare-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
-    backdrop-filter: blur(10px);
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all var(--transition-normal);
-    cursor: pointer;
-    border: 2px solid rgba(255, 193, 7, 0.5);
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .rare-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 8px 24px rgba(255, 193, 7, 0.4);
-  }
-
-  .rare-card img {
-    width: 100%;
-    aspect-ratio: 5/7;
-    object-fit: contain;
-    background: var(--color-neutral-100);
-  }
-
-  .rare-card-name {
-    padding: var(--spacing-2);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-neutral-900);
-    text-align: center;
-  }
-
-  .no-unlocks {
-    text-align: center;
-    padding: var(--spacing-8) var(--spacing-4);
-  }
-
-  .no-unlocks p {
-    font-size: var(--font-size-base);
-    color: var(--color-neutral-600);
-    margin: 0;
-  }
-
-  .hp-progress {
-    max-width: 400px;
-    margin: 0 auto;
-  }
-
-  .hp-progress-text {
+  .rare-section-text {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: #f57c00;
+    text-align: center;
     margin-bottom: var(--spacing-2);
   }
 
+  .rare-cards-thumbnails {
+    display: flex;
+    gap: var(--spacing-2);
+    justify-content: center;
+    margin-top: var(--spacing-3);
+  }
+
+  .rare-thumbnail {
+    width: 60px;
+    height: 84px;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    border: 2px solid rgba(255, 193, 7, 0.5);
+    padding: 0;
+    background: transparent;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+  }
+
+  .rare-thumbnail:disabled {
+    cursor: not-allowed;
+  }
+
+  .rare-thumbnail.unlocked:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    border-color: #f57c00;
+  }
+
+  .rare-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .rare-thumbnail img.locked {
+    filter: brightness(0.3) grayscale(1);
+  }
+
   .hp-progress-bar {
-    height: 12px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: var(--border-radius-full);
     overflow: hidden;
     border: 1px solid rgba(255, 193, 7, 0.3);
+    margin-bottom: var(--spacing-3);
   }
 
   .hp-progress-fill {

@@ -67,8 +67,18 @@
         allCards = await getAllCardsFromSet(currentSetId);
       }
 
+      const sortedCards = [...allCards].sort((a, b) => {
+        const numA = parseInt(a.localId || '0');
+        const numB = parseInt(b.localId || '0');
+        return numB - numA;
+      });
+
+      const rareCardIds = new Set(sortedCards.slice(0, 5).map(c => c.id));
+
       const collectedCardIds = new Set(collection.cards.map(c => c.id));
-      const availableCards = allCards.filter(card => !collectedCardIds.has(card.id));
+      const availableCards = allCards.filter(card =>
+        !collectedCardIds.has(card.id) && !rareCardIds.has(card.id)
+      );
 
       if (availableCards.length === 0) {
         throw new Error('Congratulations! You have collected all cards from this set!');
@@ -101,12 +111,15 @@
   }
 
   async function checkAndUnlockRareCards() {
-    const previousMilestones = Math.floor((collection.stats.totalHpDefeated - (currentQuestion?.card.hp || 0)) / 16000);
-    const currentMilestones = Math.floor(collection.stats.totalHpDefeated / 16000);
+    if (!collection.unlockedRareSets) {
+      collection.unlockedRareSets = {};
+    }
 
-    if (currentMilestones > previousMilestones) {
-      const cardsToUnlock = currentMilestones - previousMilestones;
+    if (collection.unlockedRareSets[currentSetId]) {
+      return;
+    }
 
+    if (collection.stats.totalHpDefeated >= 16000) {
       if (allCards.length === 0) {
         allCards = await getAllCardsFromSet(currentSetId);
       }
@@ -117,16 +130,9 @@
         return numB - numA;
       });
 
-      const alreadyUnlockedIds = new Set((collection.unlockedRareCards || []).map(c => c.id));
-      const availableRareCards = sortedCards.filter(card => !alreadyUnlockedIds.has(card.id));
+      const rareCards = sortedCards.slice(0, 5);
 
-      const cardsToAdd = availableRareCards.slice(0, cardsToUnlock * 5);
-
-      if (!collection.unlockedRareCards) {
-        collection.unlockedRareCards = [];
-      }
-
-      cardsToAdd.forEach(card => {
+      rareCards.forEach(card => {
         const collectedCard: CollectedCard = {
           id: card.id,
           name: card.name,
@@ -136,9 +142,14 @@
           rarity: card.rarity,
           collectedAt: new Date().toISOString()
         };
-        collection.unlockedRareCards!.push(collectedCard);
+
+        const exists = collection.cards.some(c => c.id === card.id);
+        if (!exists) {
+          collection.cards.push(collectedCard);
+        }
       });
 
+      collection.unlockedRareSets[currentSetId] = true;
       saveCollection(collection);
     }
   }
