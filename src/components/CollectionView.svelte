@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { Collection } from '../types';
   import { downloadBackup, uploadBackup } from '../utils/backup';
+  import { clearCollection } from '../services/local-storage';
 
   export let collection: Collection;
 
@@ -9,6 +10,7 @@
 
   let fileInput: HTMLInputElement;
   let message: { text: string; type: 'success' | 'error' } | null = null;
+  let showClearDialog = false;
 
   function handleExport() {
     try {
@@ -51,6 +53,25 @@
     }, 3000);
   }
 
+  function handleClearClick() {
+    showClearDialog = true;
+  }
+
+  function handleClearCancel() {
+    showClearDialog = false;
+  }
+
+  function handleClearConfirm() {
+    try {
+      clearCollection();
+      showClearDialog = false;
+      showMessage('Collection cleared successfully!', 'success');
+      dispatch('refresh');
+    } catch (error) {
+      showMessage('Failed to clear collection', 'error');
+    }
+  }
+
   $: accuracy = collection.stats.totalQuestions > 0
     ? Math.round((collection.stats.correctAnswers / collection.stats.totalQuestions) * 100)
     : 0;
@@ -65,6 +86,9 @@
       </button>
       <button class="btn-secondary" on:click={handleImportClick}>
         Import Backup
+      </button>
+      <button class="btn-error" on:click={handleClearClick}>
+        Clear This Set
       </button>
       <input
         type="file"
@@ -130,6 +154,23 @@
     </div>
   {/if}
 </div>
+
+{#if showClearDialog}
+  <div class="dialog-overlay" on:click={handleClearCancel} on:keydown={(e) => e.key === 'Escape' && handleClearCancel()} role="button" tabindex="-1">
+    <div class="dialog" on:click|stopPropagation role="dialog">
+      <h3>Clear Collection?</h3>
+      <p>Are you sure you want to clear your entire collection? This action cannot be undone.</p>
+      <div class="dialog-actions">
+        <button class="btn-secondary" on:click={handleClearCancel}>
+          Cancel
+        </button>
+        <button class="btn-error" on:click={handleClearConfirm}>
+          Clear Collection
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   .collection-view {
@@ -313,6 +354,70 @@
     border-radius: var(--border-radius-full);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
+  }
+
+  .dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn var(--transition-fast) ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .dialog {
+    background: white;
+    border-radius: var(--border-radius-2xl);
+    padding: var(--spacing-8);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp var(--transition-normal) ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dialog h3 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-neutral-900);
+    margin: 0 0 var(--spacing-4) 0;
+  }
+
+  .dialog p {
+    font-size: var(--font-size-base);
+    color: var(--color-neutral-700);
+    line-height: var(--line-height-relaxed);
+    margin: 0 0 var(--spacing-6) 0;
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
   }
 
   @media (max-width: 768px) {
