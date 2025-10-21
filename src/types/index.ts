@@ -28,6 +28,8 @@ export interface QuizQuestion {
   questionText: string;
   correctAnswer: number;
   isPokemon: boolean;
+  secondQuestion?: string;
+  secondAnswer?: number;
 }
 
 export interface CollectedCard {

@@ -8,14 +8,22 @@
   export let t: Translations;
   export let currentSet: string;
 
-  const dispatch = createEventDispatcher<{ answer: number }>();
+  const dispatch = createEventDispatcher<{ answer: { firstAnswer: number; secondAnswer?: number } }>();
 
   let userInput: string = '';
+  let secondUserInput: string = '';
 
   function handleSubmit() {
     const answer = parseInt(userInput, 10);
     if (!isNaN(answer)) {
-      dispatch('answer', answer);
+      if (question.secondQuestion && question.secondAnswer !== undefined) {
+        const secondAnswer = parseInt(secondUserInput, 10);
+        if (!isNaN(secondAnswer)) {
+          dispatch('answer', { firstAnswer: answer, secondAnswer });
+        }
+      } else {
+        dispatch('answer', { firstAnswer: answer });
+      }
     }
   }
 
@@ -32,20 +40,46 @@
   </div>
 
   <div class="question-container">
-    <h3 class="question-text">{question.questionText}</h3>
+    <div class="questions-list">
+      <div class="question-item">
+        <span class="question-number">1.</span>
+        <h3 class="question-text">{question.questionText}</h3>
+      </div>
+      {#if question.secondQuestion}
+        <div class="question-item">
+          <span class="question-number">2.</span>
+          <h3 class="question-text">{question.secondQuestion}</h3>
+        </div>
+      {/if}
+    </div>
 
-    <div class="answer-input-container">
-      <input
-        type="number"
-        bind:value={userInput}
-        on:keypress={handleKeyPress}
-        placeholder={t.enterAnswer}
-        class="answer-input"
-      />
+    <div class="answer-inputs-container">
+      <div class="input-group">
+        <label class="input-label">Answer 1:</label>
+        <input
+          type="number"
+          bind:value={userInput}
+          on:keypress={handleKeyPress}
+          placeholder={t.enterAnswer}
+          class="answer-input"
+        />
+      </div>
+      {#if question.secondQuestion}
+        <div class="input-group">
+          <label class="input-label">Answer 2:</label>
+          <input
+            type="number"
+            bind:value={secondUserInput}
+            on:keypress={handleKeyPress}
+            placeholder={t.enterAnswer}
+            class="answer-input"
+          />
+        </div>
+      {/if}
       <button
         class="submit-btn btn-primary"
         on:click={handleSubmit}
-        disabled={!userInput}
+        disabled={!userInput || (question.secondQuestion && !secondUserInput)}
       >
         {t.submitAnswer}
       </button>
@@ -109,25 +143,62 @@
     pointer-events: none;
   }
 
-  .question-text {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
-    color: white;
-    text-align: center;
-    margin: 0 0 var(--spacing-6) 0;
-    line-height: var(--line-height-relaxed);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  .questions-list {
+    margin-bottom: var(--spacing-6);
     position: relative;
     z-index: 1;
   }
 
-  .answer-input-container {
+  .question-item {
     display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-4);
+  }
+
+  .question-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .question-number {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    min-width: 40px;
+  }
+
+  .question-text {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: white;
+    margin: 0;
+    line-height: var(--line-height-relaxed);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    flex: 1;
+  }
+
+  .answer-inputs-container {
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-4);
     max-width: 500px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .input-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .answer-input {
@@ -179,11 +250,11 @@
     }
 
     .question-text {
-      font-size: var(--font-size-xl);
+      font-size: var(--font-size-lg);
     }
 
-    .answer-input-container {
-      flex-direction: column;
+    .question-number {
+      font-size: var(--font-size-xl);
     }
 
     .submit-btn {

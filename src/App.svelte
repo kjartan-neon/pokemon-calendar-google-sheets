@@ -20,6 +20,7 @@
   let collection: Collection;
   let isCorrect: boolean = false;
   let userAnswer: number = 0;
+  let secondUserAnswer: number = 0;
   let wonCard: PokemonCard | null = null;
   let errorMessage: string = '';
   let currentView: 'quiz' | 'collection' = 'quiz';
@@ -86,13 +87,16 @@
 
       const randomCard = getRandomCard(availableCards);
       const cardDetails = await getCardDetails(randomCard.id, currentSetId);
-      const question = generateQuizQuestion(cardDetails, t);
+
+      const rarity = cardDetails.rarity?.toLowerCase() || 'common';
+      const isRareCard = rarity !== 'common';
+
+      const question = generateQuizQuestion(cardDetails, t, isRareCard);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
       }
 
-      const rarity = cardDetails.rarity?.toLowerCase() || 'common';
       needsStreak = rarity !== 'common';
 
       if (collection.streakCard && collection.streakCard.id === cardDetails.id) {
@@ -154,11 +158,12 @@
     }
   }
 
-  function handleAnswer(event: CustomEvent<number>) {
+  function handleAnswer(event: CustomEvent<{ firstAnswer: number; secondAnswer?: number }>) {
     if (!currentQuestion) return;
 
-    userAnswer = event.detail;
-    isCorrect = checkAnswer(currentQuestion, userAnswer);
+    userAnswer = event.detail.firstAnswer;
+    secondUserAnswer = event.detail.secondAnswer || 0;
+    isCorrect = checkAnswer(currentQuestion, userAnswer, secondUserAnswer);
 
     const hpDefeated = isCorrect && currentQuestion.card.hp ? currentQuestion.card.hp : 0;
     updateStats(isCorrect, hpDefeated);

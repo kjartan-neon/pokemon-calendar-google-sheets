@@ -24,12 +24,22 @@ function generateRandomMathQuestion(): { question: string; answer: number } {
   return { question, answer };
 }
 
-export function generateQuizQuestion(card: PokemonCard, t: Translations): QuizQuestion | null {
+function generateAdditionQuestion(): { question: string; answer: number } {
+  const num1 = Math.floor(Math.random() * 50) + 10;
+  const num2 = Math.floor(Math.random() * 50) + 10;
+  const answer = num1 + num2;
+  const question = `What is ${num1} + ${num2}?`;
+  return { question, answer };
+}
+
+export function generateQuizQuestion(card: PokemonCard, t: Translations, isRareCard: boolean = false): QuizQuestion | null {
   if (!card) return null;
 
   let questionText: string;
   let correctAnswer: number;
   let isPokemon = false;
+  let secondQuestion: string | undefined;
+  let secondAnswer: number | undefined;
 
   if (card.hp && card.hp > 0) {
     isPokemon = true;
@@ -42,14 +52,27 @@ export function generateQuizQuestion(card: PokemonCard, t: Translations): QuizQu
     correctAnswer = mathQ.answer;
   }
 
+  if (isRareCard) {
+    const additionQ = generateAdditionQuestion();
+    secondQuestion = additionQ.question;
+    secondAnswer = additionQ.answer;
+  }
+
   return {
     card,
     questionText,
     correctAnswer,
-    isPokemon
+    isPokemon,
+    secondQuestion,
+    secondAnswer
   };
 }
 
-export function checkAnswer(question: QuizQuestion, userAnswer: number): boolean {
-  return userAnswer === question.correctAnswer;
+export function checkAnswer(question: QuizQuestion, userAnswer: number, secondUserAnswer?: number): boolean {
+  const firstCorrect = userAnswer === question.correctAnswer;
+  if (question.secondQuestion && question.secondAnswer !== undefined) {
+    const secondCorrect = secondUserAnswer === question.secondAnswer;
+    return firstCorrect && secondCorrect;
+  }
+  return firstCorrect;
 }
