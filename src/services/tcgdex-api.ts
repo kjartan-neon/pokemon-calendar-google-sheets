@@ -1,15 +1,23 @@
 import type { PokemonCard, PokemonSet } from '../types';
 
 const BASE_URL = 'https://api.tcgdex.net/v2/en';
-const TARGET_SET = 'swsh3';
 
-function formatImageUrl(cardId: string): string {
-  return `https://assets.tcgdex.net/en/swsh/${TARGET_SET}/${cardId.split('-')[1]}/high.webp`;
+function formatImageUrl(cardId: string, setId: string): string {
+  const localId = cardId.split('-')[1];
+  const series = getSeriesFromSet(setId);
+  return `https://assets.tcgdex.net/en/${series}/${setId}/${localId}/high.webp`;
 }
 
-export async function getTargetSet(): Promise<PokemonSet> {
+function getSeriesFromSet(setId: string): string {
+  if (setId.startsWith('swsh')) return 'swsh';
+  if (setId.startsWith('sv')) return 'sv';
+  if (setId.startsWith('me')) return 'base';
+  return 'swsh';
+}
+
+export async function getTargetSet(setId: string): Promise<PokemonSet> {
   try {
-    const response = await fetch(`${BASE_URL}/sets/${TARGET_SET}`);
+    const response = await fetch(`${BASE_URL}/sets/${setId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch set');
     }
@@ -20,9 +28,9 @@ export async function getTargetSet(): Promise<PokemonSet> {
   }
 }
 
-export async function getAllCardsFromSet(): Promise<PokemonCard[]> {
+export async function getAllCardsFromSet(setId: string): Promise<PokemonCard[]> {
   try {
-    const response = await fetch(`${BASE_URL}/sets/${TARGET_SET}`);
+    const response = await fetch(`${BASE_URL}/sets/${setId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch cards from set');
     }
@@ -33,7 +41,7 @@ export async function getAllCardsFromSet(): Promise<PokemonCard[]> {
       id: card.id,
       localId: card.localId,
       name: card.name,
-      image: formatImageUrl(card.id)
+      image: formatImageUrl(card.id, setId)
     }));
   } catch (error) {
     console.error('Error fetching cards from set:', error);
@@ -41,7 +49,7 @@ export async function getAllCardsFromSet(): Promise<PokemonCard[]> {
   }
 }
 
-export async function getCardDetails(cardId: string): Promise<PokemonCard> {
+export async function getCardDetails(cardId: string, setId: string): Promise<PokemonCard> {
   try {
     const response = await fetch(`${BASE_URL}/cards/${cardId}`);
     if (!response.ok) {
@@ -50,7 +58,7 @@ export async function getCardDetails(cardId: string): Promise<PokemonCard> {
     const cardData = await response.json();
     return {
       ...cardData,
-      image: formatImageUrl(cardId)
+      image: formatImageUrl(cardId, setId)
     };
   } catch (error) {
     console.error('Error fetching card details:', error);

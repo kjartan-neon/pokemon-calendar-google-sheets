@@ -1,11 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { PokemonCard } from '../types';
+  import type { Translations } from '../i18n/translations';
 
   export let isCorrect: boolean;
   export let correctAnswer: number;
   export let userAnswer: number;
   export let wonCard: PokemonCard | null;
+  export let t: Translations;
 
   const dispatch = createEventDispatcher<{ next: void }>();
 
@@ -18,13 +20,13 @@
   <div class="result-card" class:correct={isCorrect} class:incorrect={!isCorrect}>
     {#if isCorrect}
       <div class="result-icon success">✓</div>
-      <h2 class="result-title">Correct!</h2>
+      <h2 class="result-title">{t.correct}</h2>
       <p class="result-message">
-        Great job! The answer was <strong>{correctAnswer}</strong> {correctAnswer === 1 ? 'hit' : 'hits'}!
+        {t.correctMessage} <strong>{correctAnswer}</strong> {correctAnswer === 1 ? t.hit : t.hits}!
       </p>
       {#if wonCard}
         <div class="won-cards">
-          <h3>You won this card!</h3>
+          <h3>{t.youWonThisCard}</h3>
           <div class="cards-grid">
             <div class="mini-card">
               <img src={wonCard.image} alt={wonCard.name} />
@@ -35,16 +37,16 @@
       {/if}
     {:else}
       <div class="result-icon error">✗</div>
-      <h2 class="result-title">Not quite!</h2>
+      <h2 class="result-title">{t.notQuite}</h2>
       <p class="result-message">
-        You answered <strong>{userAnswer}</strong>, but the correct answer was <strong>{correctAnswer}</strong>.
+        {t.incorrectMessage} <strong>{userAnswer}</strong>, {t.correctMessage.toLowerCase()} <strong>{correctAnswer}</strong>.
       </p>
-      <p class="encouragement">Try again with the next question!</p>
+      <p class="encouragement">{t.encouragement}</p>
     {/if}
   </div>
 
   <button class="next-btn btn-primary" on:click={handleNext}>
-    Next Question
+    {t.nextQuestion}
   </button>
 </div>
 

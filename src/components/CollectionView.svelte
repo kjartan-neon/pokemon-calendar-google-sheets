@@ -1,10 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { Collection } from '../types';
+  import type { Translations } from '../i18n/translations';
   import { downloadBackup, uploadBackup } from '../utils/backup';
   import { clearCollection } from '../services/local-storage';
 
   export let collection: Collection;
+  export let t: Translations;
 
   const dispatch = createEventDispatcher<{ refresh: void }>();
 
@@ -15,9 +17,9 @@
   function handleExport() {
     try {
       downloadBackup();
-      showMessage('Collection exported successfully!', 'success');
+      showMessage(t.collectionExported, 'success');
     } catch (error) {
-      showMessage('Failed to export collection', 'error');
+      showMessage(t.exportFailed, 'error');
     }
   }
 
@@ -34,13 +36,13 @@
     try {
       const result = await uploadBackup(file);
       if (result.success) {
-        showMessage('Collection imported successfully!', 'success');
+        showMessage(t.collectionImported, 'success');
         dispatch('refresh');
       } else {
-        showMessage(result.error || 'Failed to import collection', 'error');
+        showMessage(result.error || t.importFailed, 'error');
       }
     } catch (error) {
-      showMessage('Failed to import collection', 'error');
+      showMessage(t.importFailed, 'error');
     }
 
     target.value = '';
@@ -65,10 +67,10 @@
     try {
       clearCollection();
       showClearDialog = false;
-      showMessage('Collection cleared successfully!', 'success');
+      showMessage(t.collectionCleared, 'success');
       dispatch('refresh');
     } catch (error) {
-      showMessage('Failed to clear collection', 'error');
+      showMessage(t.clearFailed, 'error');
     }
   }
 
@@ -79,16 +81,16 @@
 
 <div class="collection-view">
   <div class="collection-header">
-    <h2>Your Collection</h2>
+    <h2>{t.yourCollection}</h2>
     <div class="header-actions">
       <button class="btn-secondary" on:click={handleExport}>
-        Export Backup
+        {t.exportBackup}
       </button>
       <button class="btn-secondary" on:click={handleImportClick}>
-        Import Backup
+        {t.importBackup}
       </button>
       <button class="btn-error" on:click={handleClearClick}>
-        Clear This Set
+        {t.clearThisSet}
       </button>
       <input
         type="file"
@@ -109,27 +111,27 @@
   <div class="stats-section">
     <div class="stat-card">
       <div class="stat-value">{collection.cards.length}</div>
-      <div class="stat-label">Cards Collected</div>
+      <div class="stat-label">{t.cardsCollected}</div>
     </div>
     <div class="stat-card">
       <div class="stat-value">{collection.stats.totalQuestions}</div>
-      <div class="stat-label">Questions Answered</div>
+      <div class="stat-label">{t.questionsAnswered}</div>
     </div>
     <div class="stat-card">
       <div class="stat-value">{collection.stats.correctAnswers}</div>
-      <div class="stat-label">Correct Answers</div>
+      <div class="stat-label">{t.correctAnswers}</div>
     </div>
     <div class="stat-card">
       <div class="stat-value">{accuracy}%</div>
-      <div class="stat-label">Accuracy</div>
+      <div class="stat-label">{t.accuracy}</div>
     </div>
   </div>
 
   {#if collection.cards.length === 0}
     <div class="empty-state">
       <div class="empty-icon">📦</div>
-      <h3>No cards yet!</h3>
-      <p>Answer questions correctly to start building your collection.</p>
+      <h3>{t.noCardsYet}</h3>
+      <p>{t.noCardsDescription}</p>
     </div>
   {:else}
     <div class="cards-grid">
@@ -158,14 +160,14 @@
 {#if showClearDialog}
   <div class="dialog-overlay" on:click={handleClearCancel} on:keydown={(e) => e.key === 'Escape' && handleClearCancel()} role="button" tabindex="-1">
     <div class="dialog" on:click|stopPropagation role="dialog">
-      <h3>Clear Collection?</h3>
-      <p>Are you sure you want to clear your entire collection? This action cannot be undone.</p>
+      <h3>{t.clearCollectionTitle}</h3>
+      <p>{t.clearCollectionMessage}</p>
       <div class="dialog-actions">
         <button class="btn-secondary" on:click={handleClearCancel}>
-          Cancel
+          {t.cancel}
         </button>
         <button class="btn-error" on:click={handleClearConfirm}>
-          Clear Collection
+          {t.clearCollection}
         </button>
       </div>
     </div>

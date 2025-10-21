@@ -1,9 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { QuizQuestion } from '../types';
+  import type { Translations } from '../i18n/translations';
   import PokemonCard from './PokemonCard.svelte';
 
   export let question: QuizQuestion;
+  export let t: Translations;
+  export let currentSet: string;
 
   const dispatch = createEventDispatcher<{ answer: number }>();
 
@@ -25,8 +28,8 @@
 
 <div class="quiz-view">
   <div class="quiz-header">
-    <h2 class="quiz-title">TCG Math Challenge</h2>
-    <p class="set-info">Collecting Set: Sword & Shield - Darkness Ablaze (swsh3)</p>
+    <h2 class="quiz-title">{t.quizTitle}</h2>
+    <p class="set-info">{t.setInfo}: {currentSet}</p>
   </div>
 
   <div class="card-display">
@@ -41,7 +44,7 @@
         type="number"
         bind:value={userInput}
         on:keypress={handleKeyPress}
-        placeholder="Enter your answer"
+        placeholder={t.enterAnswer}
         class="answer-input"
       />
       <button
@@ -49,7 +52,7 @@
         on:click={handleSubmit}
         disabled={!userInput}
       >
-        Submit Answer
+        {t.submitAnswer}
       </button>
     </div>
   </div>

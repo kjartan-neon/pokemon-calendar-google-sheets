@@ -4,6 +4,8 @@
   import { getAllCardsFromSet, getCardDetails, getRandomCard } from './services/tcgdex-api';
   import { loadCollection, addCardToCollection, updateStats } from './services/local-storage';
   import { generateQuizQuestion, checkAnswer } from './utils/quiz-logic';
+  import { language, selectedSet, availableSets } from './stores/settings';
+  import { getTranslations } from './i18n/translations';
   import QuizView from './components/QuizView.svelte';
   import ResultView from './components/ResultView.svelte';
   import CollectionView from './components/CollectionView.svelte';
@@ -21,22 +23,38 @@
   let wonCard: PokemonCard | null = null;
   let errorMessage: string = '';
   let currentView: 'quiz' | 'collection' = 'quiz';
+  let currentSetId: string = $selectedSet;
+
+  $: t = getTranslations($language);
 
   onMount(() => {
     collection = loadCollection();
     loadNewQuestion();
   });
 
+  function handleSetChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    selectedSet.set(target.value);
+    currentSetId = target.value;
+    allCards = [];
+    loadNewQuestion();
+  }
+
+  function handleLanguageChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    language.set(target.value as 'en' | 'no');
+  }
+
   async function loadNewQuestion() {
     try {
       gameState = 'loading';
 
       if (allCards.length === 0) {
-        allCards = await getAllCardsFromSet();
+        allCards = await getAllCardsFromSet(currentSetId);
       }
 
       const randomCard = getRandomCard(allCards);
-      const cardDetails = await getCardDetails(randomCard.id);
+      const cardDetails = await getCardDetails(randomCard.id, currentSetId);
       const question = generateQuizQuestion(cardDetails);
 
       if (!question) {
@@ -107,21 +125,34 @@
 
 <div class="app">
   <header class="app-header">
-    <h1 class="app-title">TCG Math</h1>
+    <h1 class="app-title">{t.appTitle}</h1>
+    <div class="header-controls">
+      <div class="selectors">
+        <select class="selector" value={$selectedSet} on:change={handleSetChange}>
+          {#each availableSets as set}
+            <option value={set.id}>{set.name}</option>
+          {/each}
+        </select>
+        <select class="selector" value={$language} on:change={handleLanguageChange}>
+          <option value="en">English</option>
+          <option value="no">Norsk</option>
+        </select>
+      </div>
+    </div>
     <nav>
       <button
         class="nav-btn"
         class:active={currentView === 'quiz'}
         on:click={switchToQuiz}
       >
-        Play Quiz
+        {t.playQuiz}
       </button>
       <button
         class="nav-btn"
         class:active={currentView === 'collection'}
         on:click={switchToCollection}
       >
-        My Collection ({collection?.cards.length || 0}/{allCards.length})
+        {t.myCollection} ({collection?.cards.length || 0}/{allCards.length})
       </button>
     </nav>
   </header>
@@ -129,22 +160,23 @@
   <main>
     {#if currentView === 'quiz'}
       {#if gameState === 'loading'}
-        <LoadingView message="Loading new question..." />
+        <LoadingView message={t.loading} />
       {:else if gameState === 'quiz' && currentQuestion}
-        <QuizView question={currentQuestion} on:answer={handleAnswer} />
+        <QuizView question={currentQuestion} {t} currentSet={availableSets.find(s => s.id === currentSetId)?.name || ''} on:answer={handleAnswer} />
       {:else if gameState === 'result' && currentQuestion}
         <ResultView
           {isCorrect}
           correctAnswer={currentQuestion.correctAnswer}
           {userAnswer}
           {wonCard}
+          {t}
           on:next={handleNext}
         />
       {:else if gameState === 'error'}
         <ErrorView message={errorMessage} on:retry={handleRetry} />
       {/if}
     {:else}
-      <CollectionView {collection} on:refresh={handleRefresh} />
+      <CollectionView {collection} {t} on:refresh={handleRefresh} />
     {/if}
   </main>
 </div>
@@ -173,6 +205,48 @@
     line-height: var(--line-height-tight);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     letter-spacing: 0.5px;
+  }
+
+  .header-controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-4);
+  }
+
+  .selectors {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .selector {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-weight-semibold);
+    transition: all var(--transition-fast);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+  }
+
+  .selector:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .selector:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.4);
+    border-color: white;
+  }
+
+  .selector option {
+    background: #667eea;
+    color: white;
   }
 
   nav {
