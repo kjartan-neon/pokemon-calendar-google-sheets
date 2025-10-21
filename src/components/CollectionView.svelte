@@ -338,7 +338,7 @@
   }
 
   .rare-thumbnail img.locked {
-    
+    opacity: 0.5;
   }
 
   .hp-progress-bar {
