@@ -8,7 +8,6 @@ export interface CardSet {
 
 export const availableSets: CardSet[] = [
   { id: 'swsh3', name: 'Sword & Shield - Darkness Ablaze' },
-  { id: 'me01', name: 'McDonald\'s Collection 2021' },
   { id: 'sv05', name: 'Scarlet & Violet - Temporal Forces' },
   { id: 'sv06.5', name: 'Scarlet & Violet - Shrouded Fable' },
 ];
