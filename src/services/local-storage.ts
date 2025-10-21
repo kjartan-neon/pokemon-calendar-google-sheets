@@ -43,6 +43,10 @@ export function loadCollection(): Collection {
       parsed.currentStreak = 0;
     }
 
+    if (!parsed.unlockedRareCards) {
+      parsed.unlockedRareCards = [];
+    }
+
     return parsed;
   } catch (error) {
     console.error('Error loading collection from local storage:', error);

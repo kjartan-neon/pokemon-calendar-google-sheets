@@ -53,4 +53,5 @@ export interface Collection {
   version: string;
   currentStreak?: number;
   streakCard?: PokemonCard;
+  unlockedRareCards?: CollectedCard[];
 }

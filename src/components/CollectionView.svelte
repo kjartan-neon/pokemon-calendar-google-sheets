@@ -9,6 +9,8 @@
   export let t: Translations;
   export let language: 'en' | 'no';
 
+  let selectedCard: CollectedCard | null = null;
+
   const dispatch = createEventDispatcher<{ refresh: void; languageChange: string }>();
 
   let fileInput: HTMLInputElement;
@@ -84,29 +86,51 @@
     ? Math.round((collection.stats.correctAnswers / collection.stats.totalQuestions) * 100)
     : 0;
 
-  $: stars = Math.floor((collection.stats.totalHpDefeated || 0) / 16000);
-  $: hpToNextStar = 16000 - ((collection.stats.totalHpDefeated || 0) % 16000);
+  $: unlockedMilestones = Math.floor((collection.stats.totalHpDefeated || 0) / 16000);
+  $: hpToNextUnlock = 16000 - ((collection.stats.totalHpDefeated || 0) % 16000);
+  $: totalRareCardsUnlocked = (collection.unlockedRareCards || []).length;
+
+  function openCardModal(card: CollectedCard) {
+    selectedCard = card;
+  }
+
+  function closeCardModal() {
+    selectedCard = null;
+  }
 </script>
 
 <div class="collection-view">
-  <div class="stars-section">
-    <div class="stars-display">
-      {#if stars > 0}
-        {#each Array(stars) as _, i}
-          <span class="star filled" key={i}>⭐</span>
+  <div class="rare-cards-section">
+    <h3 class="rare-cards-title">
+      {t.language === 'Språk' ? 'Unlocked Rare Cards' : 'Låste opp sjeldne kort'}
+    </h3>
+    <div class="rare-cards-info">
+      <div class="unlock-count">
+        {totalRareCardsUnlocked} {t.language === 'Språk' ? 'cards unlocked' : 'kort låst opp'}
+      </div>
+      <div class="hp-progress">
+        <div class="hp-progress-text">
+          {t.language === 'Språk' ? `${hpToNextUnlock.toLocaleString()} HP to unlock 5 more rare cards` : `${hpToNextUnlock.toLocaleString()} HP for å låse opp 5 flere sjeldne kort`}
+        </div>
+        <div class="hp-progress-bar">
+          <div class="hp-progress-fill" style="width: {((16000 - hpToNextUnlock) / 16000) * 100}%"></div>
+        </div>
+      </div>
+    </div>
+    {#if totalRareCardsUnlocked > 0}
+      <div class="rare-cards-grid">
+        {#each collection.unlockedRareCards || [] as card}
+          <button class="rare-card" on:click={() => openCardModal(card)}>
+            <img src={card.image} alt={card.name} />
+            <div class="rare-card-name">{card.name}</div>
+          </button>
         {/each}
-      {:else}
-        <span class="no-stars">{t.language === 'Språk' ? 'No stars yet' : 'Ingen stjäerner ennå'}</span>
-      {/if}
-    </div>
-    <div class="hp-progress">
-      <div class="hp-progress-text">
-        {t.language === 'Språk' ? `${hpToNextStar.toLocaleString()} HP to next star` : `${hpToNextStar.toLocaleString()} HP til neste stjäerne`}
       </div>
-      <div class="hp-progress-bar">
-        <div class="hp-progress-fill" style="width: {((16000 - hpToNextStar) / 16000) * 100}%"></div>
+    {:else}
+      <div class="no-unlocks">
+        <p>{t.language === 'Språk' ? 'Defeat 16,000 HP to unlock your first rare cards!' : 'Beseir 16 000 HP for å låse opp dine første sjeldne kort!'}</p>
       </div>
-    </div>
+    {/if}
   </div>
 
   <div class="collection-header">
@@ -174,7 +198,7 @@
   {:else}
     <div class="cards-grid">
       {#each collection.cards as card}
-        <div class="collection-card">
+        <button class="collection-card" on:click={() => openCardModal(card)}>
           <img src={card.image} alt={card.name} />
           <div class="card-details">
             <h4>{card.name}</h4>
@@ -189,15 +213,40 @@
               </div>
             {/if}
           </div>
-        </div>
+        </button>
       {/each}
     </div>
   {/if}
 </div>
 
+{#if selectedCard}
+  <div class="dialog-overlay" on:click={closeCardModal} on:keydown={(e) => e.key === 'Escape' && closeCardModal()} role="button" tabindex="-1">
+    <div class="card-modal" on:click|stopPropagation role="dialog">
+      <button class="close-modal" on:click={closeCardModal}>&times;</button>
+      <img src={selectedCard.image} alt={selectedCard.name} class="modal-card-image" />
+      <div class="modal-card-info">
+        <h3>{selectedCard.name}</h3>
+        {#if selectedCard.hp}
+          <div class="modal-hp">HP: {selectedCard.hp}</div>
+        {/if}
+        {#if selectedCard.types && selectedCard.types.length > 0}
+          <div class="modal-types">
+            {#each selectedCard.types as type}
+              <span class="modal-type">{type}</span>
+            {/each}
+          </div>
+        {/if}
+        {#if selectedCard.rarity}
+          <div class="modal-rarity">Rarity: {selectedCard.rarity}</div>
+        {/if}
+      </div>
+    </div>
+  </div>
+{/if}
+
 {#if showClearDialog}
   <div class="dialog-overlay" on:click={handleClearCancel} on:keydown={(e) => e.key === 'Escape' && handleClearCancel()} role="button" tabindex="-1">
-    <div class="dialog" on:click|stopPropagation role="dialog">
+    <div class="dialog" on:click|stopPropagation on:keydown={() => {}} role="dialog">
       <h3>{t.clearCollectionTitle}</h3>
       <p>{t.clearCollectionMessage}</p>
       <div class="dialog-actions">
@@ -220,49 +269,84 @@
     padding: var(--spacing-6);
   }
 
-  .stars-section {
+  .rare-cards-section {
     background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
     border: 2px solid rgba(255, 193, 7, 0.3);
     border-radius: var(--border-radius-2xl);
     padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
+  }
+
+  .rare-cards-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: #f57c00;
+    margin: 0 0 var(--spacing-4) 0;
     text-align: center;
   }
 
-  .stars-display {
-    font-size: var(--font-size-4xl);
-    margin-bottom: var(--spacing-4);
-    min-height: 60px;
+  .rare-cards-info {
+    margin-bottom: var(--spacing-6);
+  }
+
+  .unlock-count {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: #f57c00;
+    text-align: center;
+    margin-bottom: var(--spacing-3);
+  }
+
+  .rare-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--spacing-4);
+    margin-top: var(--spacing-6);
+  }
+
+  .rare-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    border: 2px solid rgba(255, 193, 7, 0.5);
+    padding: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--spacing-2);
+    flex-direction: column;
   }
 
-  .star {
-    display: inline-block;
-    animation: starAppear 0.5s ease-out;
+  .rare-card:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(255, 193, 7, 0.4);
   }
 
-  @keyframes starAppear {
-    0% {
-      transform: scale(0) rotate(0deg);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1.2) rotate(180deg);
-    }
-    100% {
-      transform: scale(1) rotate(360deg);
-      opacity: 1;
-    }
+  .rare-card img {
+    width: 100%;
+    aspect-ratio: 5/7;
+    object-fit: contain;
+    background: var(--color-neutral-100);
   }
 
-  .no-stars {
+  .rare-card-name {
+    padding: var(--spacing-2);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-900);
+    text-align: center;
+  }
+
+  .no-unlocks {
+    text-align: center;
+    padding: var(--spacing-8) var(--spacing-4);
+  }
+
+  .no-unlocks p {
     font-size: var(--font-size-base);
-    color: var(--color-neutral-500);
-    font-weight: var(--font-weight-medium);
+    color: var(--color-neutral-600);
+    margin: 0;
   }
 
   .hp-progress {
@@ -477,6 +561,9 @@
     transition: all var(--transition-normal);
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 0;
+    text-align: left;
+    width: 100%;
   }
 
   .collection-card:hover {
@@ -547,6 +634,92 @@
     to {
       opacity: 1;
     }
+  }
+
+  .card-modal {
+    background: white;
+    border-radius: var(--border-radius-2xl);
+    padding: var(--spacing-8);
+    max-width: 600px;
+    width: 90%;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp var(--transition-normal) ease-out;
+    position: relative;
+  }
+
+  .close-modal {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+    background: var(--color-neutral-200);
+    border: none;
+    border-radius: var(--border-radius-full);
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-3xl);
+    line-height: 1;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--color-neutral-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-modal:hover {
+    background: var(--color-neutral-300);
+    transform: scale(1.1);
+  }
+
+  .modal-card-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    margin: 0 auto var(--spacing-6) auto;
+    display: block;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .modal-card-info {
+    text-align: center;
+  }
+
+  .modal-card-info h3 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-neutral-900);
+    margin: 0 0 var(--spacing-3) 0;
+  }
+
+  .modal-hp {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-error-600);
+    margin-bottom: var(--spacing-3);
+  }
+
+  .modal-types {
+    display: flex;
+    gap: var(--spacing-2);
+    justify-content: center;
+    margin-bottom: var(--spacing-3);
+    flex-wrap: wrap;
+  }
+
+  .modal-type {
+    background: var(--color-neutral-200);
+    color: var(--color-neutral-700);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .modal-rarity {
+    font-size: var(--font-size-base);
+    color: var(--color-neutral-600);
+    font-style: italic;
   }
 
   .dialog {

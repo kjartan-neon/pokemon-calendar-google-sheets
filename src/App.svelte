@@ -100,6 +100,49 @@
     }
   }
 
+  async function checkAndUnlockRareCards() {
+    const previousMilestones = Math.floor((collection.stats.totalHpDefeated - (currentQuestion?.card.hp || 0)) / 16000);
+    const currentMilestones = Math.floor(collection.stats.totalHpDefeated / 16000);
+
+    if (currentMilestones > previousMilestones) {
+      const cardsToUnlock = currentMilestones - previousMilestones;
+
+      if (allCards.length === 0) {
+        allCards = await getAllCardsFromSet(currentSetId);
+      }
+
+      const sortedCards = [...allCards].sort((a, b) => {
+        const numA = parseInt(a.localId || '0');
+        const numB = parseInt(b.localId || '0');
+        return numB - numA;
+      });
+
+      const alreadyUnlockedIds = new Set((collection.unlockedRareCards || []).map(c => c.id));
+      const availableRareCards = sortedCards.filter(card => !alreadyUnlockedIds.has(card.id));
+
+      const cardsToAdd = availableRareCards.slice(0, cardsToUnlock * 5);
+
+      if (!collection.unlockedRareCards) {
+        collection.unlockedRareCards = [];
+      }
+
+      cardsToAdd.forEach(card => {
+        const collectedCard: CollectedCard = {
+          id: card.id,
+          name: card.name,
+          image: card.image,
+          hp: card.hp,
+          types: card.types,
+          rarity: card.rarity,
+          collectedAt: new Date().toISOString()
+        };
+        collection.unlockedRareCards!.push(collectedCard);
+      });
+
+      saveCollection(collection);
+    }
+  }
+
   function handleAnswer(event: CustomEvent<number>) {
     if (!currentQuestion) return;
 
@@ -161,6 +204,12 @@
     }
 
     collection = loadCollection();
+
+    if (isCorrect) {
+      checkAndUnlockRareCards();
+      collection = loadCollection();
+    }
+
     gameState = 'result';
   }
 
