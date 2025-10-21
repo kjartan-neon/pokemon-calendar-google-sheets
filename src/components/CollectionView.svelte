@@ -339,7 +339,7 @@
   }
 
   .rare-thumbnail img.locked {
-    filter: brightness(0.3) grayscale(1);
+    
   }
 
   .hp-progress-bar {
