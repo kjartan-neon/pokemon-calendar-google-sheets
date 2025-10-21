@@ -63,9 +63,7 @@
           <h3 class="question-text">{question.secondQuestion}</h3>
         </div>
       {/if}
-    </div>
 
-    <div class="answer-inputs-container">
 
       {#if question.secondQuestion}
         <div class="input-group">
