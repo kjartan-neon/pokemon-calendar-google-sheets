@@ -27,11 +27,6 @@
 </script>
 
 <div class="quiz-view">
-  <div class="quiz-header">
-    <h2 class="quiz-title">{t.quizTitle}</h2>
-    <p class="set-info">{t.setInfo}: {currentSet}</p>
-  </div>
-
   <div class="card-display">
     <PokemonCard card={question.card} />
   </div>
