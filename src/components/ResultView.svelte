@@ -74,19 +74,44 @@
     background: white;
     border-radius: var(--border-radius-2xl);
     padding: var(--spacing-10);
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     text-align: center;
     max-width: 600px;
     width: 100%;
     margin-bottom: var(--spacing-8);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { transform: translate(-25%, -25%); }
+    50% { transform: translate(0%, 0%); }
   }
 
   .result-card.correct {
-    border: 4px solid var(--color-success-500);
+    border: 4px solid transparent;
+    background-image: linear-gradient(white, white), linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
   }
 
   .result-card.incorrect {
-    border: 4px solid var(--color-error-500);
+    border: 4px solid transparent;
+    background-image: linear-gradient(white, white), linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
   }
 
   .result-icon {
@@ -112,13 +137,15 @@
   }
 
   .result-icon.success {
-    background: var(--color-success-500);
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
     color: white;
+    box-shadow: 0 8px 25px rgba(132, 250, 176, 0.4);
   }
 
   .result-icon.error {
-    background: var(--color-error-500);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     color: white;
+    box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
   }
 
   .result-title {
@@ -129,11 +156,17 @@
   }
 
   .result-card.correct .result-title {
-    color: var(--color-success-700);
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .result-card.incorrect .result-title {
-    color: var(--color-error-700);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .result-message {

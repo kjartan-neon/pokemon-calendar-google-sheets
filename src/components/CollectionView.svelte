@@ -192,7 +192,10 @@
   .collection-header h2 {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-neutral-900);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin: 0;
     line-height: var(--line-height-tight);
   }
@@ -242,23 +245,29 @@
   }
 
   .stat-card {
-    background: white;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(10px);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-6);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     text-align: center;
-    transition: transform var(--transition-fast);
+    transition: all var(--transition-fast);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
   }
 
   .stat-value {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-primary-600);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     line-height: var(--line-height-tight);
   }
 
@@ -301,17 +310,19 @@
   }
 
   .collection-card {
-    background: white;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+    backdrop-filter: blur(10px);
     border-radius: var(--border-radius-xl);
     overflow: hidden;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: all var(--transition-normal);
     cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .collection-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
   }
 
   .collection-card img {

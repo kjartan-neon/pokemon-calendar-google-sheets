@@ -107,7 +107,7 @@
 
 <div class="app">
   <header class="app-header">
-    <h1>Pok\u00e9mon TCG Math Quiz</h1>
+    <h1 class="app-title">TCG Math</h1>
     <nav>
       <button
         class="nav-btn"
@@ -156,21 +156,23 @@
   }
 
   .app-header {
-    background: white;
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: var(--shadow-lg);
     padding: var(--spacing-6);
     position: sticky;
     top: 0;
     z-index: 100;
   }
 
-  .app-header h1 {
-    font-size: var(--font-size-3xl);
+  .app-title {
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-neutral-900);
+    color: white;
     margin: 0 0 var(--spacing-4) 0;
     text-align: center;
     line-height: var(--line-height-tight);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
   }
 
   nav {
@@ -180,28 +182,30 @@
   }
 
   .nav-btn {
-    background: var(--color-neutral-100);
-    color: var(--color-neutral-700);
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
     padding: var(--spacing-3) var(--spacing-6);
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-weight-semibold);
     transition: all var(--transition-fast);
-    border: 2px solid transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
   }
 
   .nav-btn:hover {
-    background: var(--color-neutral-200);
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .nav-btn.active {
-    background: var(--color-primary-600);
-    color: white;
-    border-color: var(--color-primary-700);
+    background: white;
+    color: #667eea;
+    border-color: white;
   }
 
   .nav-btn.active:hover {
-    background: var(--color-primary-700);
+    background: rgba(255, 255, 255, 0.95);
   }
 
   main {
@@ -213,7 +217,7 @@
       padding: var(--spacing-4);
     }
 
-    .app-header h1 {
+    .app-title {
       font-size: var(--font-size-2xl);
     }
 

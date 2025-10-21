@@ -43,18 +43,20 @@
 
 <style>
   .pokemon-card {
-    background: white;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    backdrop-filter: blur(10px);
     border-radius: var(--border-radius-xl);
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    transition: transform var(--transition-normal);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-normal);
     max-width: 300px;
     width: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
   }
 
   .pokemon-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-8px) rotate(-2deg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   }
 
   .card-image {
