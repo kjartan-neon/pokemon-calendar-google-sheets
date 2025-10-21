@@ -47,17 +47,8 @@
         {/if}
         <h3 class="question-text">{question.questionText}</h3>
       </div>
-      {#if question.secondQuestion}
-        <div class="question-item">
-          <span class="question-number">2.</span>
-          <h3 class="question-text">{question.secondQuestion}</h3>
-        </div>
-      {/if}
-    </div>
-
-    <div class="answer-inputs-container">
       <div class="input-group">
-        <label class="input-label">Answer 1:</label>
+        
         <input
           type="number"
           bind:value={userInput}
@@ -67,8 +58,18 @@
         />
       </div>
       {#if question.secondQuestion}
+        <div class="question-item">
+          <span class="question-number">2.</span>
+          <h3 class="question-text">{question.secondQuestion}</h3>
+        </div>
+      {/if}
+    </div>
+
+    <div class="answer-inputs-container">
+
+      {#if question.secondQuestion}
         <div class="input-group">
-          <label class="input-label">Answer 2:</label>
+          
           <input
             type="number"
             bind:value={secondUserInput}
