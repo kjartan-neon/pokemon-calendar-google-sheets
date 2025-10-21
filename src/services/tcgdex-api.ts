@@ -3,6 +3,10 @@ import type { PokemonCard, PokemonSet } from '../types';
 const BASE_URL = 'https://api.tcgdex.net/v2/en';
 const TARGET_SET = 'swsh3';
 
+function formatImageUrl(cardId: string): string {
+  return `https://assets.tcgdex.net/en/swsh/${TARGET_SET}/${cardId.split('-')[1]}/high.webp`;
+}
+
 export async function getTargetSet(): Promise<PokemonSet> {
   try {
     const response = await fetch(`${BASE_URL}/sets/${TARGET_SET}`);
@@ -29,7 +33,7 @@ export async function getAllCardsFromSet(): Promise<PokemonCard[]> {
       id: card.id,
       localId: card.localId,
       name: card.name,
-      image: card.image
+      image: formatImageUrl(card.id)
     }));
   } catch (error) {
     console.error('Error fetching cards from set:', error);
@@ -43,7 +47,11 @@ export async function getCardDetails(cardId: string): Promise<PokemonCard> {
     if (!response.ok) {
       throw new Error('Failed to fetch card details');
     }
-    return await response.json();
+    const cardData = await response.json();
+    return {
+      ...cardData,
+      image: formatImageUrl(cardId)
+    };
   } catch (error) {
     console.error('Error fetching card details:', error);
     throw error;
