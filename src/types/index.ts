@@ -44,10 +44,13 @@ export interface QuizStats {
   totalQuestions: number;
   correctAnswers: number;
   incorrectAnswers: number;
+  totalHpDefeated: number;
 }
 
 export interface Collection {
   cards: CollectedCard[];
   stats: QuizStats;
   version: string;
+  currentStreak?: number;
+  streakCard?: PokemonCard;
 }

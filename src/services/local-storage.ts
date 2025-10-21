@@ -2,13 +2,14 @@ import type { Collection, CollectedCard, QuizStats } from '../types';
 
 const COLLECTION_KEY = 'pokemon-tcg-collection';
 const STATS_KEY = 'pokemon-tcg-stats';
-const CURRENT_VERSION = '1.0';
+const CURRENT_VERSION = '2.0';
 
 function getDefaultStats(): QuizStats {
   return {
     totalQuestions: 0,
     correctAnswers: 0,
-    incorrectAnswers: 0
+    incorrectAnswers: 0,
+    totalHpDefeated: 0
   };
 }
 
@@ -32,6 +33,14 @@ export function loadCollection(): Collection {
     if (!parsed.version || !Array.isArray(parsed.cards) || !parsed.stats) {
       console.warn('Invalid collection format, resetting...');
       return getDefaultCollection();
+    }
+
+    if (!parsed.stats.totalHpDefeated) {
+      parsed.stats.totalHpDefeated = 0;
+    }
+
+    if (!parsed.currentStreak) {
+      parsed.currentStreak = 0;
     }
 
     return parsed;
@@ -72,12 +81,15 @@ export function addCardToCollection(card: CollectedCard): boolean {
   }
 }
 
-export function updateStats(correct: boolean): void {
+export function updateStats(correct: boolean, hpDefeated?: number): void {
   try {
     const collection = loadCollection();
     collection.stats.totalQuestions++;
     if (correct) {
       collection.stats.correctAnswers++;
+      if (hpDefeated) {
+        collection.stats.totalHpDefeated += hpDefeated;
+      }
     } else {
       collection.stats.incorrectAnswers++;
     }

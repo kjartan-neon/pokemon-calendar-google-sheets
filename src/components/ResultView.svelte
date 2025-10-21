@@ -8,6 +8,9 @@
   export let userAnswer: number;
   export let wonCard: PokemonCard | null;
   export let t: Translations;
+  export let needsStreak: boolean = false;
+  export let streakProgress: number = 0;
+  export let currentStreak: number = 0;
 
   const dispatch = createEventDispatcher<{ next: void }>();
 
@@ -24,6 +27,21 @@
       <p class="result-message">
         {t.correctMessage} <strong>{correctAnswer}</strong> {correctAnswer === 1 ? t.hit : t.hits}!
       </p>
+      {#if needsStreak && !wonCard}
+        <div class="streak-info">
+          <p class="streak-text">
+            {#if currentStreak === 1}
+              {t.language === 'Språk' ? 'One more correct to win this card!' : 'Én til riktig for å vinne dette kortet!'}
+            {:else}
+              {t.language === 'Språk' ? 'Get 2 correct answers to win this rare card!' : 'Få 2 riktige svar for å vinne dette sjeldne kortet!'}
+            {/if}
+          </p>
+          <div class="streak-progress">
+            <div class="streak-dot" class:filled={currentStreak >= 1}></div>
+            <div class="streak-dot" class:filled={currentStreak >= 2}></div>
+          </div>
+        </div>
+      {/if}
       {#if wonCard}
         <div class="won-cards">
           <h3>{t.youWonThisCard}</h3>
@@ -41,6 +59,9 @@
       <p class="result-message">
         {t.incorrectMessage} <strong>{userAnswer}</strong>, {t.correctMessage.toLowerCase()} <strong>{correctAnswer}</strong>.
       </p>
+      {#if needsStreak && streakProgress > 0}
+        <p class="streak-lost">{t.language === 'Språk' ? 'Streak reset! Try again.' : 'Rekke tilbakestilt! Prøv igjen.'}</p>
+      {/if}
       <p class="encouragement">{t.encouragement}</p>
     {/if}
   </div>
@@ -188,6 +209,61 @@
     color: var(--color-neutral-600);
     font-style: italic;
     margin: 0;
+  }
+
+  .streak-info {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    border-radius: var(--border-radius-xl);
+    padding: var(--spacing-4);
+    margin: var(--spacing-6) 0;
+  }
+
+  .streak-text {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: #f57c00;
+    margin: 0 0 var(--spacing-3) 0;
+    text-align: center;
+  }
+
+  .streak-progress {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: center;
+  }
+
+  .streak-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--border-radius-full);
+    background: var(--color-neutral-300);
+    border: 2px solid var(--color-neutral-400);
+    transition: all var(--transition-fast);
+  }
+
+  .streak-dot.filled {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    border-color: #f57c00;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    animation: pulse 0.5s ease-out;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  .streak-lost {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: #f57c00;
+    margin: var(--spacing-4) 0;
+    padding: var(--spacing-3);
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid rgba(255, 193, 7, 0.3);
   }
 
   .won-cards {

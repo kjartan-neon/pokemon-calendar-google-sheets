@@ -83,9 +83,32 @@
   $: accuracy = collection.stats.totalQuestions > 0
     ? Math.round((collection.stats.correctAnswers / collection.stats.totalQuestions) * 100)
     : 0;
+
+  $: stars = Math.floor((collection.stats.totalHpDefeated || 0) / 16000);
+  $: hpToNextStar = 16000 - ((collection.stats.totalHpDefeated || 0) % 16000);
 </script>
 
 <div class="collection-view">
+  <div class="stars-section">
+    <div class="stars-display">
+      {#if stars > 0}
+        {#each Array(stars) as _, i}
+          <span class="star filled" key={i}>⭐</span>
+        {/each}
+      {:else}
+        <span class="no-stars">{t.language === 'Språk' ? 'No stars yet' : 'Ingen stjäerner ennå'}</span>
+      {/if}
+    </div>
+    <div class="hp-progress">
+      <div class="hp-progress-text">
+        {t.language === 'Språk' ? `${hpToNextStar.toLocaleString()} HP to next star` : `${hpToNextStar.toLocaleString()} HP til neste stjäerne`}
+      </div>
+      <div class="hp-progress-bar">
+        <div class="hp-progress-fill" style="width: {((16000 - hpToNextStar) / 16000) * 100}%"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="collection-header">
     <h2>{t.yourCollection}</h2>
     <div class="header-controls">
@@ -195,6 +218,78 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--spacing-6);
+  }
+
+  .stars-section {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    border-radius: var(--border-radius-2xl);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
+    text-align: center;
+  }
+
+  .stars-display {
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--spacing-4);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+
+  .star {
+    display: inline-block;
+    animation: starAppear 0.5s ease-out;
+  }
+
+  @keyframes starAppear {
+    0% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+      transform: scale(1) rotate(360deg);
+      opacity: 1;
+    }
+  }
+
+  .no-stars {
+    font-size: var(--font-size-base);
+    color: var(--color-neutral-500);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .hp-progress {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .hp-progress-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: #f57c00;
+    margin-bottom: var(--spacing-2);
+  }
+
+  .hp-progress-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+  }
+
+  .hp-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+    transition: width var(--transition-normal);
+    border-radius: var(--border-radius-full);
   }
 
   .collection-header {

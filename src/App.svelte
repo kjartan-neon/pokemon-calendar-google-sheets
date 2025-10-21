@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import type { PokemonCard, QuizQuestion, CollectedCard, Collection } from './types';
   import { getAllCardsFromSet, getCardDetails, getRandomCard } from './services/tcgdex-api';
-  import { loadCollection, addCardToCollection, updateStats } from './services/local-storage';
+  import { loadCollection, addCardToCollection, updateStats, saveCollection } from './services/local-storage';
   import { generateQuizQuestion, checkAnswer } from './utils/quiz-logic';
   import { language, selectedSet, availableSets } from './stores/settings';
   import { getTranslations } from './i18n/translations';
@@ -25,6 +25,8 @@
   let currentView: 'quiz' | 'collection' = 'quiz';
   let showLanguageDialog = false;
   let currentSetId: string = $selectedSet;
+  let needsStreak = false;
+  let streakProgress = 0;
 
   $: t = getTranslations($language);
 
@@ -80,6 +82,15 @@
         throw new Error('Could not generate a valid question. Please try again.');
       }
 
+      const rarity = cardDetails.rarity?.toLowerCase() || 'common';
+      needsStreak = rarity !== 'common';
+
+      if (collection.streakCard && collection.streakCard.id === cardDetails.id) {
+        streakProgress = collection.currentStreak || 0;
+      } else {
+        streakProgress = 0;
+      }
+
       currentQuestion = question;
       gameState = 'quiz';
     } catch (error) {
@@ -95,24 +106,57 @@
     userAnswer = event.detail;
     isCorrect = checkAnswer(currentQuestion, userAnswer);
 
-    updateStats(isCorrect);
+    const hpDefeated = isCorrect && currentQuestion.card.hp ? currentQuestion.card.hp : 0;
+    updateStats(isCorrect, hpDefeated);
 
     wonCard = null;
     if (isCorrect) {
-      const collectedCard: CollectedCard = {
-        id: currentQuestion.card.id,
-        name: currentQuestion.card.name,
-        image: currentQuestion.card.image,
-        hp: currentQuestion.card.hp,
-        types: currentQuestion.card.types,
-        rarity: currentQuestion.card.rarity,
-        collectedAt: new Date().toISOString()
-      };
+      let canCollect = false;
 
-      const added = addCardToCollection(collectedCard);
+      if (needsStreak) {
+        collection = loadCollection();
 
-      if (added) {
-        wonCard = currentQuestion.card;
+        if (collection.streakCard?.id === currentQuestion.card.id) {
+          collection.currentStreak = (collection.currentStreak || 0) + 1;
+        } else {
+          collection.streakCard = currentQuestion.card;
+          collection.currentStreak = 1;
+        }
+
+        if (collection.currentStreak >= 2) {
+          canCollect = true;
+          collection.currentStreak = 0;
+          collection.streakCard = undefined;
+        }
+
+        saveCollection(collection);
+      } else {
+        canCollect = true;
+      }
+
+      if (canCollect) {
+        const collectedCard: CollectedCard = {
+          id: currentQuestion.card.id,
+          name: currentQuestion.card.name,
+          image: currentQuestion.card.image,
+          hp: currentQuestion.card.hp,
+          types: currentQuestion.card.types,
+          rarity: currentQuestion.card.rarity,
+          collectedAt: new Date().toISOString()
+        };
+
+        const added = addCardToCollection(collectedCard);
+
+        if (added) {
+          wonCard = currentQuestion.card;
+        }
+      }
+    } else {
+      collection = loadCollection();
+      if (needsStreak && collection.streakCard?.id === currentQuestion.card.id) {
+        collection.currentStreak = 0;
+        collection.streakCard = undefined;
+        saveCollection(collection);
       }
     }
 
@@ -183,6 +227,9 @@
           {userAnswer}
           {wonCard}
           {t}
+          {needsStreak}
+          {streakProgress}
+          currentStreak={collection.currentStreak || 0}
           on:next={handleNext}
         />
       {:else if gameState === 'error'}

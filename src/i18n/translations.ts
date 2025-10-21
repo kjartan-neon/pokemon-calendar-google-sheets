@@ -45,7 +45,7 @@ export interface Translations {
 
 export const translations: Record<Language, Translations> = {
   en: {
-    appTitle: 'TCG Math',
+    appTitle: '16 K',
     quizTitle: 'TCG Math Challenge',
     playQuiz: 'Play Quiz',
     myCollection: 'My Collection',
@@ -87,7 +87,7 @@ export const translations: Record<Language, Translations> = {
     language: 'Language',
   },
   no: {
-    appTitle: 'TCG Matte',
+    appTitle: '16 K',
     quizTitle: 'TCG Matte Utfordring',
     playQuiz: 'Spill Quiz',
     myCollection: 'Min Samling',
