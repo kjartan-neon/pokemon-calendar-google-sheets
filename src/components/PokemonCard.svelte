@@ -18,19 +18,6 @@
         <span class="rarity-badge">{card.rarity}</span>
       </div>
     {/if}
-    {#if card.hp}
-      <div class="card-hp">
-        <span class="hp-label">HP</span>
-        <span class="hp-value">{card.hp}</span>
-      </div>
-    {/if}
-    {#if card.types && card.types.length > 0}
-      <div class="card-types">
-        {#each card.types as type}
-          <span class="type-badge">{type}</span>
-        {/each}
-      </div>
-    {/if}
     {#if showAttacks && card.attacks && card.attacks.length > 0}
       <div class="card-attacks">
         <h4>Attacks:</h4>
