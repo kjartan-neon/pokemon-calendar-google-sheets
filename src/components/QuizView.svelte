@@ -42,7 +42,9 @@
   <div class="question-container">
     <div class="questions-list">
       <div class="question-item">
-        <span class="question-number">1.</span>
+        {#if question.secondQuestion}
+          <span class="question-number">1.</span>
+        {/if}
         <h3 class="question-text">{question.questionText}</h3>
       </div>
       {#if question.secondQuestion}
