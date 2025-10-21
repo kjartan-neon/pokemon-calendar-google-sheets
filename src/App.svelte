@@ -89,7 +89,7 @@
       const cardDetails = await getCardDetails(randomCard.id, currentSetId);
 
       const rarity = cardDetails.rarity?.toLowerCase() || 'common';
-      const needsDoubleQuestion = rarity !== 'common' && rarity !== 'rare' && rarity !== 'double rare';
+      const needsDoubleQuestion = rarity !== 'common' && rarity !== 'uncommon' && rarity !== 'rare' && rarity !== 'double rare';
 
       const question = generateQuizQuestion(cardDetails, t, needsDoubleQuestion);
 
