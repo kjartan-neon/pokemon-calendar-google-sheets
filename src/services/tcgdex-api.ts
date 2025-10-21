@@ -10,9 +10,11 @@ export async function getLatestSet(): Promise<PokemonSet> {
     }
     const sets: PokemonSet[] = await response.json();
 
-    const sortedSets = sets.sort((a, b) => {
-      return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
-    });
+    const sortedSets = sets
+      .filter(set => set.cardCount && set.cardCount.total > 20)
+      .sort((a, b) => {
+        return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+      });
 
     return sortedSets[0];
   } catch (error) {
@@ -29,7 +31,24 @@ export async function getCardsFromSet(setId: string): Promise<PokemonCard[]> {
     }
     const setData = await response.json();
 
-    return setData.cards || [];
+    const cardList = setData.cards || [];
+    const detailedCards: PokemonCard[] = [];
+
+    for (let i = 0; i < Math.min(cardList.length, 20); i++) {
+      try {
+        const cardDetail = await getCardDetails(cardList[i].id);
+        if (cardDetail.attacks && cardDetail.attacks.length > 0 && cardDetail.hp && cardDetail.hp > 0) {
+          detailedCards.push(cardDetail);
+        }
+        if (detailedCards.length >= 10) {
+          break;
+        }
+      } catch (error) {
+        console.error(`Failed to fetch card ${cardList[i].id}:`, error);
+      }
+    }
+
+    return detailedCards;
   } catch (error) {
     console.error('Error fetching cards from set:', error);
     throw error;
