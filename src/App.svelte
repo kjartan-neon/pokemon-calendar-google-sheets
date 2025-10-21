@@ -29,19 +29,27 @@
 
   async function loadNewQuestion() {
     try {
+      console.log('loadNewQuestion called, current allCards.length:', allCards.length);
       gameState = 'loading';
 
       if (allCards.length < 2) {
+        console.log('Fetching new cards...');
         allCards = await getCardsForQuiz();
+        console.log('Fetched cards, total:', allCards.length);
       }
 
+      console.log('Getting random cards...');
       const selectedCards = getRandomCards(allCards, 2);
+      console.log('Selected cards:', selectedCards.map(c => c.name));
+
+      console.log('Generating quiz question...');
       const question = generateQuizQuestion(selectedCards);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
       }
 
+      console.log('Question generated successfully');
       currentQuestion = question;
       gameState = 'quiz';
     } catch (error) {

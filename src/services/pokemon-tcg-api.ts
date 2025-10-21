@@ -60,6 +60,9 @@ function transformCard(apiCard: PokemonTCGAPICard): PokemonCard {
 
 export async function getCardsForQuiz(): Promise<PokemonCard[]> {
   try {
+    console.log('Starting getCardsForQuiz...');
+    console.log('API_KEY exists:', !!API_KEY);
+
     const query = 'supertype:Pokémon hp:[30 TO *] attacks.damage:[10 TO *]';
     const pageSize = 50;
     const randomPage = Math.floor(Math.random() * 10) + 1;
@@ -70,15 +73,22 @@ export async function getCardsForQuiz(): Promise<PokemonCard[]> {
     url.searchParams.append('page', randomPage.toString());
     url.searchParams.append('orderBy', '-set.releaseDate');
 
+    console.log('Fetching from URL:', url.toString());
+
     const response = await fetch(url.toString(), {
       headers: getHeaders()
     });
 
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error response:', errorText);
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
 
     const data: PokemonTCGAPIResponse = await response.json();
+    console.log('Received data, total cards:', data.data.length);
 
     const validCards = data.data
       .filter(card => {
@@ -96,10 +106,14 @@ export async function getCardsForQuiz(): Promise<PokemonCard[]> {
       })
       .map(transformCard);
 
+    console.log('Valid cards after filtering:', validCards.length);
+
     if (validCards.length < 10) {
+      console.warn('Not enough valid cards, only found:', validCards.length);
       throw new Error('Not enough valid cards found. Please try again.');
     }
 
+    console.log('Successfully returning', validCards.length, 'cards');
     return validCards;
   } catch (error) {
     console.error('Error fetching cards from Pokemon TCG API:', error);
