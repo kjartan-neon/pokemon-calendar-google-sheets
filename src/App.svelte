@@ -53,7 +53,14 @@
         allCards = await getAllCardsFromSet(currentSetId);
       }
 
-      const randomCard = getRandomCard(allCards);
+      const collectedCardIds = new Set(collection.cards.map(c => c.id));
+      const availableCards = allCards.filter(card => !collectedCardIds.has(card.id));
+
+      if (availableCards.length === 0) {
+        throw new Error('Congratulations! You have collected all cards from this set!');
+      }
+
+      const randomCard = getRandomCard(availableCards);
       const cardDetails = await getCardDetails(randomCard.id, currentSetId);
       const question = generateQuizQuestion(cardDetails);
 
