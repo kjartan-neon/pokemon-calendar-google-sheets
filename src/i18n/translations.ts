@@ -89,7 +89,7 @@ export const translations: Record<Language, Translations> = {
     damageQuestion: (damage: number) => `Your Pokémon deals ${damage} damage each turn. How many turns does it take to defeat this Pokémon?`,
   },
   no: {
-    appTitle: '16 K',
+    appTitle: '16 K Pokémon Matteutfordring',
     quizTitle: 'TCG Matte Utfordring',
     playQuiz: 'Spill Quiz',
     myCollection: 'Min Samling',
