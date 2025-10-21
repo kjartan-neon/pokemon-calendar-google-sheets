@@ -188,8 +188,9 @@
 
 <div class="app">
   <header class="app-header">
-    <h1 class="app-title">{t.appTitle}</h1>
-    <nav>
+    <div class="header-content">
+      <h1 class="app-title">{t.appTitle}</h1>
+      <nav>
       <button
         class="nav-btn"
         class:active={currentView === 'quiz'}
@@ -204,7 +205,8 @@
       >
         {t.myCollection} ({collection?.cards.length || 0}/{allCards.length})
       </button>
-    </nav>
+      </nav>
+    </div>
   </header>
 
   <main>
@@ -267,23 +269,80 @@
   }
 
   .app-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: var(--shadow-lg);
-    padding: var(--spacing-6);
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-6);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .app-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+    z-index: 0;
+  }
+
+  .app-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmerSlide 3s infinite;
+    z-index: 1;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes shimmerSlide {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 200%;
+    }
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-6);
   }
 
   .app-title {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     color: white;
-    margin: 0 0 var(--spacing-4) 0;
-    text-align: center;
+    margin: 0;
+    text-align: left;
     line-height: var(--line-height-tight);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     letter-spacing: 0.5px;
+    flex-shrink: 0;
   }
 
 
@@ -425,8 +484,9 @@
 
   nav {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     gap: var(--spacing-3);
+    flex: 1;
   }
 
   .nav-btn {
@@ -465,12 +525,19 @@
       padding: var(--spacing-4);
     }
 
+    .header-content {
+      flex-direction: column;
+      gap: var(--spacing-4);
+    }
+
     .app-title {
       font-size: var(--font-size-2xl);
+      text-align: center;
     }
 
     nav {
       flex-direction: column;
+      width: 100%;
     }
 
     .nav-btn {
