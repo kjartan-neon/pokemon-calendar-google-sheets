@@ -141,7 +141,7 @@
           class="rare-thumbnail"
           class:unlocked={isUnlocked}
           on:click={() => isUnlocked && openCardModal({ ...card, collectedAt: new Date().toISOString() })}
-          disabled={!isUnlocked}
+          
         >
           <img src={card.image} alt={card.name} class:locked={!isUnlocked} />
         </button>
