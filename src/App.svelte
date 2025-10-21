@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { PokemonCard, QuizQuestion, CollectedCard, Collection } from './types';
-  import { getLatestSet, getCardsFromSet, getRandomCards } from './services/tcgdex-api';
+  import { getCardsForQuiz, getRandomCards } from './services/pokemon-tcg-api';
   import { loadCollection, addCardToCollection, updateStats } from './services/local-storage';
   import { generateQuizQuestion, checkAnswer } from './utils/quiz-logic';
   import QuizView from './components/QuizView.svelte';
@@ -32,8 +32,7 @@
       gameState = 'loading';
 
       if (allCards.length < 2) {
-        const latestSet = await getLatestSet();
-        allCards = await getCardsFromSet(latestSet.id);
+        allCards = await getCardsForQuiz();
       }
 
       const selectedCards = getRandomCards(allCards, 2);
