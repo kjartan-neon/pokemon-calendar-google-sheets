@@ -36,7 +36,7 @@
 
 <div class="quiz-view">
   <div class="card-display">
-    <PokemonCard card={question.card} />
+    <PokemonCard card={question.card} showRarity={true} />
   </div>
 
   <div class="question-container">

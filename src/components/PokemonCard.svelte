@@ -4,6 +4,7 @@
   export let card: PokemonCard;
   export let showAttacks: boolean = false;
   export let highlightedAttack: string | null = null;
+  export let showRarity: boolean = false;
 </script>
 
 <div class="pokemon-card">
@@ -12,6 +13,11 @@
   </div>
   <div class="card-info">
     <h3 class="card-name">{card.name}</h3>
+    {#if showRarity && card.rarity}
+      <div class="card-rarity">
+        <span class="rarity-badge">{card.rarity}</span>
+      </div>
+    {/if}
     {#if card.hp}
       <div class="card-hp">
         <span class="hp-label">HP</span>
@@ -82,6 +88,23 @@
     color: var(--color-neutral-900);
     margin: 0 0 var(--spacing-3) 0;
     line-height: var(--line-height-tight);
+  }
+
+  .card-rarity {
+    margin-bottom: var(--spacing-3);
+  }
+
+  .rarity-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
   }
 
   .card-hp {

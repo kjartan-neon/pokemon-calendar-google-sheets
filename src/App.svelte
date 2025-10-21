@@ -89,9 +89,9 @@
       const cardDetails = await getCardDetails(randomCard.id, currentSetId);
 
       const rarity = cardDetails.rarity?.toLowerCase() || 'common';
-      const isRareCard = rarity !== 'common';
+      const needsDoubleQuestion = rarity !== 'common' && rarity !== 'rare' && rarity !== 'double rare';
 
-      const question = generateQuizQuestion(cardDetails, t, isRareCard);
+      const question = generateQuizQuestion(cardDetails, t, needsDoubleQuestion);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
