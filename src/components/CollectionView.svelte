@@ -4,7 +4,7 @@
   import type { Translations } from '../i18n/translations';
   import { downloadBackup, uploadBackup } from '../utils/backup';
   import { clearCollection } from '../services/local-storage';
-  import { selectedSet } from '../stores/settings';
+  import { selectedSet, klassetrinn } from '../stores/settings';
   import { getAllCardsFromSet } from '../services/tcgdex-api';
 
   export let collection: Collection;
@@ -104,6 +104,11 @@
     dispatch('languageChange', target.value);
   }
 
+  function handleKlassetrinnChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    klassetrinn.set(Number(target.value) as 1 | 2 | 3 | 4 | 5);
+  }
+
   $: accuracy = collection.stats.totalQuestions > 0
     ? Math.round((collection.stats.correctAnswers / collection.stats.totalQuestions) * 100)
     : 0;
@@ -201,12 +206,24 @@
   </div>
 
   <div class="functions-section">
-    <div class="language-selector-container">
-      <label for="language-select">{t.language || 'Language'}:</label>
-      <select id="language-select" class="language-selector" value={language} on:change={handleLanguageChange}>
-        <option value="en">English</option>
-        <option value="no">Norsk</option>
-      </select>
+    <div class="settings-selectors">
+      <div class="selector-group">
+        <label for="language-select">{t.language || 'Language'}:</label>
+        <select id="language-select" class="settings-selector" value={language} on:change={handleLanguageChange}>
+          <option value="en">English</option>
+          <option value="no">Norsk</option>
+        </select>
+      </div>
+      <div class="selector-group">
+        <label for="klassetrinn-select">{t.gradeLevel}:</label>
+        <select id="klassetrinn-select" class="settings-selector" value={$klassetrinn} on:change={handleKlassetrinnChange}>
+          <option value={1}>{t.gradeLevel} 1</option>
+          <option value={2}>{t.gradeLevel} 2</option>
+          <option value={3}>{t.gradeLevel} 3</option>
+          <option value={4}>{t.gradeLevel} 4</option>
+          <option value={5}>{t.gradeLevel} 5</option>
+        </select>
+      </div>
     </div>
     <div class="functions-actions">
       <button class="btn-secondary" on:click={handleExport}>
@@ -383,19 +400,25 @@
     border-top: 2px solid rgba(102, 126, 234, 0.2);
   }
 
-  .language-selector-container {
+  .settings-selectors {
+    display: flex;
+    gap: var(--spacing-6);
+    flex-wrap: wrap;
+  }
+
+  .selector-group {
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
   }
 
-  .language-selector-container label {
+  .selector-group label {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: var(--color-neutral-700);
   }
 
-  .language-selector {
+  .settings-selector {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
     backdrop-filter: blur(10px);
     color: var(--color-neutral-900);
@@ -409,19 +432,19 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .language-selector:hover {
+  .settings-selector:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
     border-color: rgba(102, 126, 234, 0.5);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  .language-selector:focus {
+  .settings-selector:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   }
 
-  .language-selector option {
+  .settings-selector option {
     background: white;
     color: var(--color-neutral-900);
   }
@@ -761,8 +784,14 @@
       align-items: stretch;
     }
 
-    .language-selector-container {
+    .settings-selectors {
+      flex-direction: column;
+      gap: var(--spacing-3);
+    }
+
+    .selector-group {
       justify-content: space-between;
+      width: 100%;
     }
 
     .functions-actions {

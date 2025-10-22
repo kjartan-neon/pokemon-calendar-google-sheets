@@ -59,10 +59,21 @@
     language.set(value as 'en' | 'no');
   }
 
+  let selectedLanguageTemp: 'en' | 'no' = 'en';
+  let selectedKlassetrinnTemp: 1 | 2 | 3 | 4 | 5 = 4;
+  let showKlassetrinnStep = false;
+
   function handleLanguageSelect(selectedLanguage: 'en' | 'no') {
-    language.set(selectedLanguage);
+    selectedLanguageTemp = selectedLanguage;
+    showKlassetrinnStep = true;
+  }
+
+  function handleKlassetrinnSelect(selectedLevel: 1 | 2 | 3 | 4 | 5) {
+    language.set(selectedLanguageTemp);
+    klassetrinn.set(selectedLevel);
     localStorage.setItem('tcg-seen-language-dialog', 'true');
     showLanguageDialog = false;
+    showKlassetrinnStep = false;
     loadNewQuestion();
   }
 
@@ -285,18 +296,11 @@
       {#if gameState === 'loading'}
         <LoadingView message={t.loading} />
       {:else if gameState === 'quiz' && currentQuestion}
-        <div class="settings-container">
+        <div class="set-selector-container">
           <select class="set-selector" value={$selectedSet} on:change={handleSetChange}>
             {#each availableSets as set}
               <option value={set.id}>{set.name}</option>
             {/each}
-          </select>
-          <select class="klassetrinn-selector" value={$klassetrinn} on:change={handleKlassetrinnChange}>
-            <option value={1}>{t.gradeLevel} 1</option>
-            <option value={2}>{t.gradeLevel} 2</option>
-            <option value={3}>{t.gradeLevel} 3</option>
-            <option value={4}>{t.gradeLevel} 4</option>
-            <option value={5}>{t.gradeLevel} 5</option>
           </select>
         </div>
         <QuizView question={currentQuestion} {t} currentSet={availableSets.find(s => s.id === currentSetId)?.name || ''} on:answer={handleAnswer} />
@@ -323,18 +327,45 @@
 {#if showLanguageDialog}
   <div class="dialog-overlay" role="button" tabindex="-1">
     <div class="dialog language-dialog">
-      <h2>{$language === 'en' ? 'Choose Your Language' : 'Velg språk'}</h2>
-      <p>{$language === 'en' ? 'You can change this anytime in My Collection' : 'Du kan endre dette når som helst i Min samling'}</p>
-      <div class="language-buttons">
-        <button class="language-btn" on:click={() => handleLanguageSelect('en')}>
-          <span class="flag">🇬🇧</span>
-          <span>English</span>
-        </button>
-        <button class="language-btn" on:click={() => handleLanguageSelect('no')}>
-          <span class="flag">🇳🇴</span>
-          <span>Norsk</span>
-        </button>
-      </div>
+      {#if !showKlassetrinnStep}
+        <h2>{$language === 'en' ? 'Choose Your Language' : 'Velg språk'}</h2>
+        <p>{$language === 'en' ? 'You can change this anytime in My Collection' : 'Du kan endre dette når som helst i Min samling'}</p>
+        <div class="language-buttons">
+          <button class="language-btn" on:click={() => handleLanguageSelect('en')}>
+            <span class="flag">🇬🇧</span>
+            <span>English</span>
+          </button>
+          <button class="language-btn" on:click={() => handleLanguageSelect('no')}>
+            <span class="flag">🇳🇴</span>
+            <span>Norsk</span>
+          </button>
+        </div>
+      {:else}
+        <h2>{selectedLanguageTemp === 'en' ? 'Choose Grade Level' : 'Velg Klassetrinn'}</h2>
+        <p>{selectedLanguageTemp === 'en' ? 'Select the appropriate difficulty level. You can change this anytime in My Collection.' : 'Velg passende vanskelighetsnivå. Du kan endre dette når som helst i Min samling.'}</p>
+        <div class="klassetrinn-buttons">
+          <button class="klassetrinn-btn" on:click={() => handleKlassetrinnSelect(1)}>
+            <span class="grade-number">1</span>
+            <span class="grade-description">{selectedLanguageTemp === 'en' ? 'Simple addition (5 + 3)' : 'Enkel addisjon (5 + 3)'}</span>
+          </button>
+          <button class="klassetrinn-btn" on:click={() => handleKlassetrinnSelect(2)}>
+            <span class="grade-number">2</span>
+            <span class="grade-description">{selectedLanguageTemp === 'en' ? 'Addition & subtraction' : 'Addisjon og subtraksjon'}</span>
+          </button>
+          <button class="klassetrinn-btn" on:click={() => handleKlassetrinnSelect(3)}>
+            <span class="grade-number">3</span>
+            <span class="grade-description">{selectedLanguageTemp === 'en' ? 'Addition & subtraction' : 'Addisjon og subtraksjon'}</span>
+          </button>
+          <button class="klassetrinn-btn" on:click={() => handleKlassetrinnSelect(4)}>
+            <span class="grade-number">4</span>
+            <span class="grade-description">{selectedLanguageTemp === 'en' ? 'With Pokemon challenges' : 'Med Pokemon utfordringer'}</span>
+          </button>
+          <button class="klassetrinn-btn" on:click={() => handleKlassetrinnSelect(5)}>
+            <span class="grade-number">5</span>
+            <span class="grade-description">{selectedLanguageTemp === 'en' ? 'With Pokemon challenges' : 'Med Pokemon utfordringer'}</span>
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
@@ -424,17 +455,14 @@
   }
 
 
-  .settings-container {
+  .set-selector-container {
     display: flex;
     justify-content: center;
-    gap: var(--spacing-4);
     margin-bottom: var(--spacing-6);
     padding: 0 var(--spacing-6);
-    flex-wrap: wrap;
   }
 
-  .set-selector,
-  .klassetrinn-selector {
+  .set-selector {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
     backdrop-filter: blur(10px);
     color: var(--color-neutral-900);
@@ -448,23 +476,20 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .set-selector:hover,
-  .klassetrinn-selector:hover {
+  .set-selector:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     border-color: rgba(102, 126, 234, 0.5);
   }
 
-  .set-selector:focus,
-  .klassetrinn-selector:focus {
+  .set-selector:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   }
 
-  .set-selector option,
-  .klassetrinn-selector option {
+  .set-selector option {
     background: white;
     color: var(--color-neutral-900);
   }
@@ -564,6 +589,51 @@
 
   .language-btn .flag {
     font-size: 3rem;
+  }
+
+  .klassetrinn-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .klassetrinn-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: var(--border-radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--color-neutral-900);
+    text-align: left;
+  }
+
+  .klassetrinn-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border-color: #667eea;
+  }
+
+  .grade-number {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    min-width: 50px;
+  }
+
+  .grade-description {
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-600);
+    line-height: var(--line-height-relaxed);
   }
 
   nav {
