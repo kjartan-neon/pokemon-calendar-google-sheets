@@ -4,7 +4,7 @@
   import { getAllCardsFromSet, getCardDetails, getRandomCard } from './services/tcgdex-api';
   import { loadCollection, addCardToCollection, updateStats, saveCollection } from './services/local-storage';
   import { generateQuizQuestion, checkAnswer } from './utils/quiz-logic';
-  import { language, selectedSet, availableSets } from './stores/settings';
+  import { language, selectedSet, availableSets, klassetrinn } from './stores/settings';
   import { getTranslations } from './i18n/translations';
   import QuizView from './components/QuizView.svelte';
   import ResultView from './components/ResultView.svelte';
@@ -46,6 +46,12 @@
     selectedSet.set(target.value);
     currentSetId = target.value;
     allCards = [];
+    loadNewQuestion();
+  }
+
+  function handleKlassetrinnChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    klassetrinn.set(Number(target.value) as 1 | 2 | 3 | 4 | 5);
     loadNewQuestion();
   }
 
@@ -91,7 +97,7 @@
       const rarity = cardDetails.rarity?.toLowerCase() || 'common';
       const needsDoubleQuestion = rarity !== 'common' && rarity !== 'uncommon' && rarity !== 'rare' && rarity !== 'double rare';
 
-      const question = generateQuizQuestion(cardDetails, t, needsDoubleQuestion);
+      const question = generateQuizQuestion(cardDetails, t, needsDoubleQuestion, $klassetrinn);
 
       if (!question) {
         throw new Error('Could not generate a valid question. Please try again.');
@@ -279,11 +285,18 @@
       {#if gameState === 'loading'}
         <LoadingView message={t.loading} />
       {:else if gameState === 'quiz' && currentQuestion}
-        <div class="set-selector-container">
+        <div class="settings-container">
           <select class="set-selector" value={$selectedSet} on:change={handleSetChange}>
             {#each availableSets as set}
               <option value={set.id}>{set.name}</option>
             {/each}
+          </select>
+          <select class="klassetrinn-selector" value={$klassetrinn} on:change={handleKlassetrinnChange}>
+            <option value={1}>{t.gradeLevel} 1</option>
+            <option value={2}>{t.gradeLevel} 2</option>
+            <option value={3}>{t.gradeLevel} 3</option>
+            <option value={4}>{t.gradeLevel} 4</option>
+            <option value={5}>{t.gradeLevel} 5</option>
           </select>
         </div>
         <QuizView question={currentQuestion} {t} currentSet={availableSets.find(s => s.id === currentSetId)?.name || ''} on:answer={handleAnswer} />
@@ -411,14 +424,17 @@
   }
 
 
-  .set-selector-container {
+  .settings-container {
     display: flex;
     justify-content: center;
+    gap: var(--spacing-4);
     margin-bottom: var(--spacing-6);
     padding: 0 var(--spacing-6);
+    flex-wrap: wrap;
   }
 
-  .set-selector {
+  .set-selector,
+  .klassetrinn-selector {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
     backdrop-filter: blur(10px);
     color: var(--color-neutral-900);
@@ -432,20 +448,23 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .set-selector:hover {
+  .set-selector:hover,
+  .klassetrinn-selector:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     border-color: rgba(102, 126, 234, 0.5);
   }
 
-  .set-selector:focus {
+  .set-selector:focus,
+  .klassetrinn-selector:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   }
 
-  .set-selector option {
+  .set-selector option,
+  .klassetrinn-selector option {
     background: white;
     color: var(--color-neutral-900);
   }

@@ -14,15 +14,19 @@ export const availableSets: CardSet[] = [
 
 const SETTINGS_KEY = 'tcg-math-settings';
 
+export type Klassetrinn = 1 | 2 | 3 | 4 | 5;
+
 interface Settings {
   language: Language;
   selectedSet: string;
+  klassetrinn: Klassetrinn;
 }
 
 function getDefaultSettings(): Settings {
   return {
     language: 'en',
     selectedSet: 'swsh3',
+    klassetrinn: 4,
   };
 }
 
@@ -34,6 +38,7 @@ function loadSettings(): Settings {
       return {
         language: parsed.language || 'en',
         selectedSet: parsed.selectedSet || 'swsh3',
+        klassetrinn: parsed.klassetrinn || 4,
       };
     }
   } catch (error) {
@@ -54,6 +59,7 @@ const initialSettings = loadSettings();
 
 export const language = writable<Language>(initialSettings.language);
 export const selectedSet = writable<string>(initialSettings.selectedSet);
+export const klassetrinn = writable<Klassetrinn>(initialSettings.klassetrinn);
 
 language.subscribe(value => {
   const current = loadSettings();
@@ -63,4 +69,9 @@ language.subscribe(value => {
 selectedSet.subscribe(value => {
   const current = loadSettings();
   saveSettings({ ...current, selectedSet: value });
+});
+
+klassetrinn.subscribe(value => {
+  const current = loadSettings();
+  saveSettings({ ...current, klassetrinn: value });
 });

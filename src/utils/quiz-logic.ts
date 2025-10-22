@@ -1,5 +1,39 @@
 import type { PokemonCard, QuizQuestion } from '../types';
 import type { Translations } from '../i18n/translations';
+import type { Klassetrinn } from '../stores/settings';
+
+function generateKlassetrinn1Question(t: Translations): { question: string; answer: number } {
+  const num1 = Math.floor(Math.random() * 9) + 1;
+  const num2 = Math.floor(Math.random() * 9) + 1;
+  const answer = num1 + num2;
+  const question = t.mathQuestion(num1, num2, '+');
+  return { question, answer };
+}
+
+function generateKlassetrinn2And3Question(t: Translations): { question: string; answer: number } {
+  const operators: Array<'+' | '-'> = ['+', '-'];
+  const operator = operators[Math.floor(Math.random() * operators.length)];
+
+  let answer: number;
+  let question: string;
+
+  if (operator === '+') {
+    const num1 = Math.floor(Math.random() * 50) + 10;
+    const num2 = Math.floor(Math.random() * 50) + 10;
+    answer = num1 + num2;
+    question = t.mathQuestion(num1, num2, '+');
+  } else {
+    const num1 = Math.floor(Math.random() * 50) + 10;
+    const num2 = Math.floor(Math.random() * 50) + 10;
+    answer = num1 + num2;
+    const largerNum = answer;
+    const smallerNum = num1;
+    answer = smallerNum;
+    question = t.mathQuestion(largerNum, num2, '-');
+  }
+
+  return { question, answer };
+}
 
 function generateRandomMathQuestion(t: Translations): { question: string; answer: number } {
   const num1 = Math.floor(Math.random() * 50) + 10;
@@ -32,7 +66,7 @@ function generateAdditionQuestion(t: Translations): { question: string; answer: 
   return { question, answer };
 }
 
-export function generateQuizQuestion(card: PokemonCard, t: Translations, isRareCard: boolean = false): QuizQuestion | null {
+export function generateQuizQuestion(card: PokemonCard, t: Translations, isRareCard: boolean = false, klassetrinn: Klassetrinn = 4): QuizQuestion | null {
   if (!card) return null;
 
   let questionText: string;
@@ -41,21 +75,41 @@ export function generateQuizQuestion(card: PokemonCard, t: Translations, isRareC
   let secondQuestion: string | undefined;
   let secondAnswer: number | undefined;
 
-  if (card.hp && card.hp > 0) {
-    isPokemon = true;
-    const damagePerTurn = [10, 20, 30, 40, 50, 60, 60 , 80, 120, 300][Math.floor(Math.random() * 5)];
-    correctAnswer = Math.ceil(card.hp / damagePerTurn);
-    questionText = t.damageQuestion(damagePerTurn);
-  } else {
-    const mathQ = generateRandomMathQuestion(t);
+  if (klassetrinn === 1) {
+    const mathQ = generateKlassetrinn1Question(t);
     questionText = mathQ.question;
     correctAnswer = mathQ.answer;
+  } else if (klassetrinn === 2 || klassetrinn === 3) {
+    const mathQ = generateKlassetrinn2And3Question(t);
+    questionText = mathQ.question;
+    correctAnswer = mathQ.answer;
+  } else {
+    if (card.hp && card.hp > 0) {
+      isPokemon = true;
+      const damagePerTurn = [10, 20, 30, 40, 50, 60, 60 , 80, 120, 300][Math.floor(Math.random() * 5)];
+      correctAnswer = Math.ceil(card.hp / damagePerTurn);
+      questionText = t.damageQuestion(damagePerTurn);
+    } else {
+      const mathQ = generateRandomMathQuestion(t);
+      questionText = mathQ.question;
+      correctAnswer = mathQ.answer;
+    }
   }
 
   if (isRareCard) {
-    const additionQ = generateAdditionQuestion(t);
-    secondQuestion = additionQ.question;
-    secondAnswer = additionQ.answer;
+    if (klassetrinn === 1) {
+      const additionQ = generateKlassetrinn1Question(t);
+      secondQuestion = additionQ.question;
+      secondAnswer = additionQ.answer;
+    } else if (klassetrinn === 2 || klassetrinn === 3) {
+      const additionQ = generateKlassetrinn2And3Question(t);
+      secondQuestion = additionQ.question;
+      secondAnswer = additionQ.answer;
+    } else {
+      const additionQ = generateAdditionQuestion(t);
+      secondQuestion = additionQ.question;
+      secondAnswer = additionQ.answer;
+    }
   }
 
   return {

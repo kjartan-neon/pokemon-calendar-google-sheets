@@ -41,6 +41,7 @@ export interface Translations {
   loading: string;
   yourCollection: string;
   language: string;
+  gradeLevel: string;
   damageQuestion: (damage: number) => string;
   mathQuestion: (num1: number, num2: number, operator: '+' | '-') => string;
 }
@@ -87,6 +88,7 @@ export const translations: Record<Language, Translations> = {
     loading: 'Loading new question...',
     yourCollection: 'Your Collection',
     language: 'Language',
+    gradeLevel: 'Grade Level',
     damageQuestion: (damage: number) => `Your Pokémon deals ${damage} damage each turn. How many turns does it take to defeat this Pokémon?`,
     mathQuestion: (num1: number, num2: number, operator: '+' | '-') => `What is ${num1} ${operator} ${num2}?`,
   },
@@ -131,6 +133,7 @@ export const translations: Record<Language, Translations> = {
     loading: 'Laster nytt spørsmål...',
     yourCollection: 'Din Samling',
     language: 'Språk',
+    gradeLevel: 'Klassetrinn',
     damageQuestion: (damage: number) => `Din Pokémon gjør ${damage} skade hver runde. Hvor mange runder tar det å beseire denne Pokémonen?`,
     mathQuestion: (num1: number, num2: number, operator: '+' | '-') => `Hva er ${num1} ${operator} ${num2}?`,
   },
