@@ -329,8 +329,9 @@
   <div class="dialog-overlay" role="button" tabindex="-1">
     <div class="dialog language-dialog">
       {#if !showKlassetrinnStep}
-        <h2>{$language === 'en' ? 'Choose Your Language' : 'Velkommen'}</h2>
-        <p>{$language === 'en' ? 'You can change this anytime in My Collection' : 'Hei! Dette er et matte spill for barn i 1-7 trinn, og her skal du samle på pokemon kort. Du skal finne finne de super sjeldene gull kortene ved og slå kort med tilsammen 16000HP. Velg språk: (du kan endre dette når som helst i Min samling)'}</p>
+        <h2>Hello!</h2>
+        <p>Dette er et matte spill for barn i 1-7 trinn, og her skal du samle på pokemon kort. Du skal finne finne de supersjeldene gull kortene ved å slå kort med tilsammen 16000 HP. </p>
+        <p>Solve math problems collect get cards. Beat 16000 HP in total to get super rare cards! </p>
         <div class="language-buttons">
           <button class="language-btn" on:click={() => handleLanguageSelect('en')}>
             <span class="flag">🇬🇧</span>
