@@ -341,8 +341,8 @@
             <span class="flag">🇳🇴</span>
             <span>Norsk</span>
           </button>
-          <p> Laget av / Made by Sigmund (10) & Kjartan</p>
         </div>
+        <p> Laget av / Made by Sigmund (10) & Kjartan</p>
       {:else}
         <h2>{selectedLanguageTemp === 'en' ? 'Choose Grade Level' : 'Velg Klassetrinn'}</h2>
         <p>{selectedLanguageTemp === 'en' ? 'Select the appropriate difficulty level. You can change this anytime in My Collection.' : 'Velg passende vanskelighetsnivå. Du kan endre dette når som helst i Min samling.'}</p>
