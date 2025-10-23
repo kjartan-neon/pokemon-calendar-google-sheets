@@ -330,7 +330,7 @@
     <div class="dialog language-dialog">
       {#if !showKlassetrinnStep}
         <h2>Hello!</h2>
-        <p>Dette er et matte spill for barn i 1-7 trinn, og her skal du samle på pokemon kort. Du skal finne finne de supersjeldene gull kortene ved å slå kort med tilsammen 16000 HP. </p>
+        <p>Dette er et mattespill for barn i 1-7 trinn, og her skal du samle på pokemon kort. Du skal finne finne de supersjeldene gull kortene ved å slå kort med tilsammen 16000 HP. </p>
         <p>Solve math problems collect get cards. Beat 16000 HP in total to get super rare cards! </p>
         <div class="language-buttons">
           <button class="language-btn" on:click={() => handleLanguageSelect('en')}>
@@ -341,6 +341,7 @@
             <span class="flag">🇳🇴</span>
             <span>Norsk</span>
           </button>
+          <p> Laget av / Made by Sigmund & Kjartan</p>
         </div>
       {:else}
         <h2>{selectedLanguageTemp === 'en' ? 'Choose Grade Level' : 'Velg Klassetrinn'}</h2>
