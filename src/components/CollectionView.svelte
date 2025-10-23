@@ -277,7 +277,7 @@
         style="display: none;"
       />
     </div>
-    <p style="background-color: white;">This website is not produced, endorsed, supported, or affiliated with Nintendo or The Pokémon Company. Data from https://tcgdex.dev/</p>
+    <p style="background-color: white;">This website is not produced, endorsed, supported, or affiliated with Nintendo or The Pokémon Company. Data from https://tcgdex.dev/. Pokémon and all elements of the Pokémon franchise are © 1995-2025 Nintendo, GAME FREAK inc. TM © and Creatures Inc.</p>
   </div>
 
   {#if message}
