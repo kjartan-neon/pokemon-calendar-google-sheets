@@ -299,8 +299,7 @@
   }
 
   .rare-cards-section {
-    background-image: url("/src/assets/headerbackground.png");
-    background-size: cover; background-position: center top;
+    background: #020421;
     border: 5px solid rgba(255, 193, 7, 0.3);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-4);
