@@ -130,9 +130,9 @@
   <div class="rare-cards-section">
     <div class="rare-section-text">
       {#if isUnlocked}
-        {t.language === 'Språk' ? 'Rare cards unlocked!' : 'Sjeldne kort låst opp!'}
+        {language === 'en' ? 'Rare cards unlocked!' : 'Sjeldne kort låst opp!'}
       {:else}
-        {t.language === 'Språk' ? `Defeat ${hpToUnlock > 0 ? hpToUnlock.toLocaleString() : 0} HP to unlock 5 rare cards` : `Beseire ${hpToUnlock > 0 ? hpToUnlock.toLocaleString() : 0} HP for å låse opp 5 sjeldne kort`}
+        {language === 'en' ? `Defeat ${hpToUnlock > 0 ? hpToUnlock.toLocaleString() : 0} HP to unlock 5 rare cards` : `Beseire ${hpToUnlock > 0 ? hpToUnlock.toLocaleString() : 0} HP for å låse opp 5 sjeldne kort`}
       {/if}
     </div>
     {#if !isUnlocked}
