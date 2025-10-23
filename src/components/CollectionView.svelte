@@ -153,10 +153,6 @@
     </div>
   </div>
 
-  <div class="collection-header">
-    <h2>{t.yourCollection}</h2>
-  </div>
-
   {#if collection.cards.length === 0}
     <div class="empty-state">
       <div class="empty-icon">📦</div>
@@ -303,7 +299,7 @@
   }
 
   .rare-cards-section {
-    background: white;
+    background-image: url("/src/assets/headerbackground.png");
     border: 2px solid rgba(255, 193, 7, 0.3);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-4);
