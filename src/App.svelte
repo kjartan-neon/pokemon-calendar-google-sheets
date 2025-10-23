@@ -11,6 +11,7 @@
   import CollectionView from './components/CollectionView.svelte';
   import LoadingView from './components/LoadingView.svelte';
   import ErrorView from './components/ErrorView.svelte';
+  import headerBackground from './assets/headerbackground.png';
 
   type GameState = 'loading' | 'quiz' | 'result' | 'collection' | 'error';
 
@@ -394,43 +395,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 20%, #6BCF7F 40%, #4D96FF 60%, #9D50BB 80%, #FF6B6B 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
+    background-image: url('${headerBackground}');
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
     z-index: 0;
-  }
-
-  .app-header::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    animation: shimmerSlide 3s infinite;
-    z-index: 1;
-  }
-
-  @keyframes gradientShift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  @keyframes shimmerSlide {
-    0% {
-      left: -100%;
-    }
-    100% {
-      left: 200%;
-    }
   }
 
   .header-content {
@@ -444,7 +413,7 @@
 
   .app-title {
     font-family: var(--font-retro);
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
     color: white;
     margin: 0;
