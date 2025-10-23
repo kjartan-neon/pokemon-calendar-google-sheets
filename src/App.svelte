@@ -114,7 +114,7 @@
         throw new Error('Could not generate a valid question. Please try again.');
       }
 
-      needsStreak = rarity !== 'common';
+      needsStreak = needsDoubleQuestion ? false : (rarity !== 'common' && rarity !== 'uncommon' && rarity !== 'rare' && rarity !== 'double rare');
 
       if (collection.streakCard && collection.streakCard.id === cardDetails.id) {
         streakProgress = collection.currentStreak || 0;
