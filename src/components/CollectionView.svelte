@@ -277,7 +277,7 @@
         style="display: none;"
       />
     </div>
-    <p style="background-color: white;">This website is not produced, endorsed, supported, or affiliated with Nintendo or The Pokémon Company.</p>
+    <p style="background-color: white;">This website is not produced, endorsed, supported, or affiliated with Nintendo or The Pokémon Company. Data from https://tcgdex.dev/</p>
   </div>
 
   {#if message}
