@@ -277,6 +277,7 @@
         style="display: none;"
       />
     </div>
+    <p>This website is not produced, endorsed, supported, or affiliated with Nintendo or The Pokémon Company.</p>
   </div>
 
   {#if message}
