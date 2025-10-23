@@ -444,7 +444,7 @@
 
   .app-title {
     font-family: var(--font-retro);
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: white;
     margin: 0;
