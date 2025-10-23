@@ -394,7 +394,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 20%, #6BCF7F 40%, #4D96FF 60%, #9D50BB 80%, #FF6B6B 100%);
     background-size: 200% 200%;
     animation: gradientShift 8s ease infinite;
     z-index: 0;
@@ -470,7 +470,7 @@
     border-radius: var(--border-radius-xl);
     font-weight: var(--font-weight-semibold);
     transition: all var(--transition-fast);
-    border: 2px solid rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 107, 107, 0.3);
     cursor: pointer;
     font-size: var(--font-size-base);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -480,13 +480,15 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    border-color: rgba(102, 126, 234, 0.5);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
   }
 
   .set-selector:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
   }
 
   .set-selector option {
@@ -541,7 +543,7 @@
   .language-dialog h2 {
     font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 25%, #6BCF7F 50%, #4D96FF 75%, #9D50BB 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -570,7 +572,7 @@
     gap: var(--spacing-3);
     padding: var(--spacing-6);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-    border: 2px solid rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 107, 107, 0.3);
     border-radius: var(--border-radius-xl);
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -582,9 +584,10 @@
 
   .language-btn:hover {
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.4);
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
-    border-color: #667eea;
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
   }
 
   .language-btn .flag {
@@ -605,7 +608,7 @@
     gap: var(--spacing-4);
     padding: var(--spacing-4) var(--spacing-5);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-    border: 2px solid rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 107, 107, 0.3);
     border-radius: var(--border-radius-xl);
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -615,15 +618,16 @@
 
   .klassetrinn-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.4);
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
-    border-color: #667eea;
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
   }
 
   .grade-number {
     font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 25%, #6BCF7F 50%, #4D96FF 75%, #9D50BB 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -662,12 +666,20 @@
 
   .nav-btn.active {
     background: white;
-    color: #667eea;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 25%, #6BCF7F 50%, #4D96FF 75%, #9D50BB 100%);
     border-color: white;
   }
 
   .nav-btn.active:hover {
-    background: rgba(255, 255, 255, 0.95);
+    background: white;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 25%, #6BCF7F 50%, #4D96FF 75%, #9D50BB 100%);
   }
 
   main {

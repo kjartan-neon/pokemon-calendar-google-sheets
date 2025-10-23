@@ -381,7 +381,7 @@
   .collection-header h2 {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 25%, #6BCF7F 50%, #4D96FF 75%, #9D50BB 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -397,7 +397,7 @@
     gap: var(--spacing-4);
     margin-top: var(--spacing-8);
     padding-top: var(--spacing-8);
-    border-top: 2px solid rgba(102, 126, 234, 0.2);
+    border-top: 2px solid rgba(255, 107, 107, 0.2);
   }
 
   .settings-selectors {
@@ -426,7 +426,7 @@
     border-radius: var(--border-radius-lg);
     font-weight: var(--font-weight-semibold);
     transition: all var(--transition-fast);
-    border: 2px solid rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(255, 107, 107, 0.3);
     cursor: pointer;
     font-size: var(--font-size-sm);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -434,14 +434,16 @@
 
   .settings-selector:hover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
-    border-color: rgba(102, 126, 234, 0.5);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .settings-selector:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
   }
 
   .settings-selector option {
@@ -513,7 +515,7 @@
   .stat-value {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 25%, #6BCF7F 50%, #4D96FF 75%, #9D50BB 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
