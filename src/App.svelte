@@ -141,7 +141,7 @@
       return;
     }
 
-    if (collection.stats.totalHpDefeated >= 160) {
+    if (collection.stats.totalHpDefeated >= 16000) {
       if (allCards.length === 0) {
         allCards = await getAllCardsFromSet(currentSetId);
       }
