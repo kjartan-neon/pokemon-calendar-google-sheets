@@ -84,7 +84,7 @@
     </div>
   </div>
 </div>
-<a href="https://www.freecounterstat.com" title="page counter"><img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=8a579qzwg3m7e55xdnrwxqlhshnb21xd" border="0" title="page counter" alt="page counter"></a>
+<a href="https://www.freecounterstat.com" title="page counter"><img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=8a579qzwg3m7e55xdnrwxqlhshnb21xd" border="0" title="page counter" alt="page counter" style="width: 1px;"></a>
 
 <style>
   .quiz-view {
