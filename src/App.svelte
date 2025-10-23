@@ -605,7 +605,7 @@
   }
 
   .nav-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.5);
     color: white;
     padding: var(--spacing-3) var(--spacing-6);
     border-radius: var(--border-radius-lg);
