@@ -4,7 +4,7 @@
   import type { Translations } from '../i18n/translations';
   import { downloadBackup, uploadBackup } from '../utils/backup';
   import { clearCollection } from '../services/local-storage';
-  import { selectedSet, klassetrinn } from '../stores/settings';
+  import { selectedSet, klassetrinn, availableSets } from '../stores/settings';
   import { getAllCardsFromSet } from '../services/tcgdex-api';
 
   export let collection: Collection;
@@ -14,14 +14,15 @@
   let selectedCard: CollectedCard | null = null;
   let allCards: PokemonCard[] = [];
   let rareCards: PokemonCard[] = [];
+  let viewSet: string = $selectedSet;
 
   onMount(async () => {
-    await loadRareCards();
+    await loadCardsForSet();
   });
 
-  async function loadRareCards() {
+  async function loadCardsForSet() {
     try {
-      allCards = await getAllCardsFromSet($selectedSet);
+      allCards = await getAllCardsFromSet(viewSet);
       const sortedCards = [...allCards].sort((a, b) => {
         const numA = parseInt(a.localId || '0');
         const numB = parseInt(b.localId || '0');
@@ -31,6 +32,12 @@
     } catch (error) {
       console.error('Error loading rare cards:', error);
     }
+  }
+
+  function handleSetChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    viewSet = target.value;
+    loadCardsForSet();
   }
 
   const dispatch = createEventDispatcher<{ refresh: void; languageChange: string }>();
@@ -114,8 +121,13 @@
     : 0;
 
   $: hpToUnlock = 16000 - (collection.stats.totalHpDefeated || 0);
-  $: isUnlocked = (collection.unlockedRareSets && collection.unlockedRareSets[$selectedSet]) || false;
+  $: isUnlocked = (collection.unlockedRareSets && collection.unlockedRareSets[viewSet]) || false;
   $: progressPercent = Math.min((collection.stats.totalHpDefeated / 16000) * 100, 100);
+
+  $: filteredCards = collection.cards.filter(card => card.id.startsWith(viewSet + '-'));
+  $: collectedCount = filteredCards.length;
+  $: totalCount = allCards.length;
+  $: missingCount = totalCount - collectedCount;
 
   function openCardModal(card: CollectedCard) {
     selectedCard = card;
@@ -127,6 +139,22 @@
 </script>
 
 <div class="collection-view">
+  <div class="set-selector-container">
+    <select class="set-selector" value={viewSet} on:change={handleSetChange}>
+      {#each availableSets as set}
+        <option value={set.id}>{set.name}</option>
+      {/each}
+    </select>
+    <div class="set-counter">
+      {language === 'en' ? `Collected: ${collectedCount} / ${totalCount}` : `Samlet: ${collectedCount} / ${totalCount}`}
+      {#if missingCount > 0}
+        <span class="missing-count">
+          ({language === 'en' ? `${missingCount} missing` : `${missingCount} mangler`})
+        </span>
+      {/if}
+    </div>
+  </div>
+
   <div class="rare-cards-section">
     <div class="rare-section-text">
       {#if isUnlocked}
@@ -161,7 +189,7 @@
     </div>
   {:else}
     <div class="cards-grid">
-      {#each collection.cards as card}
+      {#each filteredCards as card}
         <button class="collection-card" on:click={() => openCardModal(card)}>
           <img src={card.image} alt={card.name} />
           <div class="card-details">
@@ -296,6 +324,69 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--spacing-6);
+  }
+
+  .set-selector-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-8);
+    padding: var(--spacing-4);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 107, 107, 0.3);
+  }
+
+  .set-selector {
+    background: white;
+    color: var(--color-neutral-900);
+    padding: var(--spacing-3) var(--spacing-6);
+    border-radius: var(--border-radius-lg);
+    font-weight: var(--font-weight-semibold);
+    transition: all var(--transition-fast);
+    border: 2px solid rgba(255, 107, 107, 0.3);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+  }
+
+  .set-selector:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
+  }
+
+  .set-selector:focus {
+    outline: none;
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF, #9D50BB) 1;
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+  }
+
+  .set-selector option {
+    background: white;
+    color: var(--color-neutral-900);
+  }
+
+  .set-counter {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-neutral-900);
+    text-align: center;
+  }
+
+  .missing-count {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: #f57c00;
+    margin-top: var(--spacing-1);
   }
 
   .rare-cards-section {
