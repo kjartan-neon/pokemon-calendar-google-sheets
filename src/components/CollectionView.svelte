@@ -128,6 +128,11 @@
   $: collectedCount = filteredCards.length;
   $: totalCount = allCards.length;
   $: missingCount = totalCount - collectedCount;
+  $: regularCardsTotal = allCards.length - 5;
+  $: regularCardsCollected = filteredCards.filter(card => {
+    const cardInRares = rareCards.some(rare => rare.id === card.id);
+    return !cardInRares;
+  }).length;
 
   function openCardModal(card: CollectedCard) {
     selectedCard = card;
@@ -146,12 +151,17 @@
       {/each}
     </select>
     <div class="set-counter">
-      {language === 'en' ? `Collected: ${collectedCount} / ${totalCount}` : `Samlet: ${collectedCount} / ${totalCount}`}
-      {#if missingCount > 0}
-        <!--span class="missing-count">
-          ({language === 'en' ? `${missingCount} missing` : `${missingCount} mangler`})
-      </span-->
-      {/if}
+      <div class="regular-cards-count">
+        {language === 'en' ? `Quiz Cards: ${regularCardsCollected} / ${regularCardsTotal}` : `Quiz-kort: ${regularCardsCollected} / ${regularCardsTotal}`}
+      </div>
+      <div class="total-cards-count">
+        {language === 'en' ? `Total: ${collectedCount} / ${totalCount}` : `Totalt: ${collectedCount} / ${totalCount}`}
+        {#if missingCount > 0}
+          <span class="missing-count">
+            ({language === 'en' ? `${missingCount} missing` : `${missingCount} mangler`})
+          </span>
+        {/if}
+      </div>
     </div>
   </div>
 
@@ -375,18 +385,30 @@
   }
 
   .set-counter {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-neutral-900);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
     text-align: center;
   }
 
+  .regular-cards-count {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-700);
+  }
+
+  .total-cards-count {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-neutral-900);
+  }
+
   .missing-count {
-    display: block;
+    display: inline;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: #f57c00;
-    margin-top: var(--spacing-1);
+    margin-left: var(--spacing-1);
   }
 
   .rare-cards-section {
