@@ -300,7 +300,7 @@
 
   .rare-cards-section {
     background-image: url("/src/assets/headerbackground.png");
-    border: 2px solid rgba(255, 193, 7, 0.3);
+    border: 5px solid rgba(255, 193, 7, 0.3);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-4);
     margin-bottom: var(--spacing-8);
