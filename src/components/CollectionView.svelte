@@ -148,9 +148,9 @@
     <div class="set-counter">
       {language === 'en' ? `Collected: ${collectedCount} / ${totalCount}` : `Samlet: ${collectedCount} / ${totalCount}`}
       {#if missingCount > 0}
-        <span class="missing-count">
+        <!--span class="missing-count">
           ({language === 'en' ? `${missingCount} missing` : `${missingCount} mangler`})
-        </span>
+      </span-->
       {/if}
     </div>
   </div>
