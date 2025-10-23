@@ -242,14 +242,14 @@
   <div class="functions-section">
     <div class="settings-selectors">
       <div class="selector-group">
-        <label for="language-select">{t.language || 'Language'}:</label>
+        <label for="language-select" style="color: white;">{t.language || 'Language'}:</label>
         <select id="language-select" class="settings-selector" value={language} on:change={handleLanguageChange}>
           <option value="en">English</option>
           <option value="no">Norsk</option>
         </select>
       </div>
       <div class="selector-group">
-        <label for="klassetrinn-select">{t.gradeLevel}:</label>
+        <label for="klassetrinn-select" style="color: white;">{t.gradeLevel}:</label>
         <select id="klassetrinn-select" class="settings-selector" value={$klassetrinn} on:change={handleKlassetrinnChange}>
           <option value={1}>{t.gradeLevel} 1</option>
           <option value={2}>{t.gradeLevel} 2</option>
