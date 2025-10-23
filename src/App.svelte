@@ -270,7 +270,7 @@
 </script>
 
 <div class="app">
-  <header class="app-header">
+  <header class="app-header" style="background-image: url({headerBackground}); background-size: cover; background-position: top center; background-repeat: no-repeat;">
     <div class="header-content">
       <h1 class="app-title">{t.appTitle}</h1>
       <nav>
@@ -388,19 +388,6 @@
     position: relative;
   }
 
-  .app-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('${headerBackground}');
-    background-size: cover;
-    background-position: top center;
-    background-repeat: no-repeat;
-    z-index: 0;
-  }
 
   .header-content {
     position: relative;
