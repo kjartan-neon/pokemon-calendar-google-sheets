@@ -333,7 +333,7 @@
     gap: var(--spacing-3);
     margin-bottom: var(--spacing-8);
     padding: var(--spacing-4);
-    background: #020421e0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
     backdrop-filter: blur(10px);
     border-radius: var(--border-radius-xl);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
