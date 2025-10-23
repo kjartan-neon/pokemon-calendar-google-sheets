@@ -443,13 +443,14 @@
   }
 
   .app-title {
-    font-size: var(--font-size-4xl);
+    font-family: var(--font-retro);
+    font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
     color: white;
     margin: 0;
     text-align: left;
     line-height: var(--line-height-tight);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.5px;
     flex-shrink: 0;
   }
@@ -697,7 +698,7 @@
     }
 
     .app-title {
-      font-size: var(--font-size-2xl);
+      font-size: var(--font-size-xl);
       text-align: center;
     }
 
